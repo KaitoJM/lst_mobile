@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'dart:convert';
@@ -35,6 +37,33 @@ class _OrderFormState extends State<OrderForm> {
   bool loadedOption = false;
   bool loadedCustomers = false;
   bool loadedUsers = false;
+
+  Future<void> _showErrorMessage(String title, String msg) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(msg),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   void getProductOptions() async {
     Response response = await get('http://172.18.5.209:8080/api/get-sessions-products/${sessionId}');
@@ -297,33 +326,36 @@ class _OrderFormState extends State<OrderForm> {
                 onPressed: () async {
                   print(form);
 
-                  Response response = await post('http://172.18.5.209:8080/api/submit-order',
-                    headers: <String, String>{
-                      'Content-Type': 'application/json; charset=UTF-8',
-                    },
-                    body: jsonEncode(<String, dynamic>{
-                      'session_id': sessionId,
-                      'customer_id': form.customer.id.toString(),
-                      'customer_fname': form.customer.fname,
-                      'customer_lname': form.customer.lname,
-                      'customer_email': form.customer.email,
-                      'customer_phone': form.customer.phone,
-                      'customer_address': form.customer.address,
-                      'customer_gender': form.customer.gender,
-                      'author_id': form.userId,
-                      'items': jsonEncode(form.items)
-                    })
-                  );
+                  try {
+                    Response response = await post('http://172.18.5.209:8080/api/submit-order',
+                        headers: <String, String>{
+                          'Content-Type': 'application/json; charset=UTF-8',
+                        },
+                        body: jsonEncode(<String, dynamic>{
+                          'session_id': sessionId,
+                          'customer_id': form.customer.id.toString(),
+                          'customer_fname': form.customer.fname,
+                          'customer_lname': form.customer.lname,
+                          'customer_email': form.customer.email,
+                          'customer_phone': form.customer.phone,
+                          'customer_address': form.customer.address,
+                          'customer_gender': form.customer.gender,
+                          'author_id': form.userId,
+                          'items': jsonEncode(form.items)
+                        })
+                    );
 
-                  Map responseMap = json.decode(response.body);
-                  print(responseMap);
-                  if (responseMap['err'] == 0) {
-                    Navigator.pop(context, true);
-//                    Navigator.pop(
-//                        context,
-//                        new MaterialPageRoute(
-//                            builder: (BuildContext context) => new OrderList()));
+                    Map responseMap = json.decode(response.body);
+                    print(responseMap);
+                    if (responseMap['err'] == 0) {
+                      Navigator.pop(context, true);
+                    } else {
+                      _showErrorMessage('Woah!', responseMap['msg']);
+                    }
+                  } catch (Error) {
+                    _showErrorMessage('Woah!', 'Please fill up all the given information.');
                   }
+
                 },
                 padding: EdgeInsets.all(10),
                 icon: Icon(Icons.save,
