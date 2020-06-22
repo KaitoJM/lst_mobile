@@ -65,6 +65,88 @@ class _OrderFormState extends State<OrderForm> {
     );
   }
 
+  Future<void> _showCustomerForm() async {
+    switch (await showDialog(
+        context: context,
+//        barrierDismissible: false, // user must tap button!
+        builder: (BuildContext context) {
+//          var height = MediaQuery.of(context).size.height;
+          var width = MediaQuery.of(context).size.width;
+          
+          return SimpleDialog(
+            title: Text('Add new Customer'),
+            children: <Widget>[
+              Container(
+//                height: height - 10,
+                width: width - 5,
+                child: Padding(
+                  padding: EdgeInsets.all(15),
+                  child: Container(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        TextField(
+                          onChanged: (val) {
+
+                          },
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'First Name',
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        TextField(
+                          onChanged: (val) {
+
+                          },
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Last Name',
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        TextField(
+                          onChanged: (val) {
+
+                          },
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Email',
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        TextField(
+                          onChanged: (val) {
+
+                          },
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Phone',
+                          ),
+                        ),
+                        SizedBox(height: 10),
+                        TextField(
+                          onChanged: (val) {
+
+                          },
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Address',
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              )
+            ],
+          );
+        }
+    )) {
+
+    }
+  }
+
   void getProductOptions() async {
     Response response = await get('http://172.18.5.209:8080/api/get-sessions-products/${sessionId}');
     List<dynamic> options = json.decode(response.body);
@@ -182,20 +264,35 @@ class _OrderFormState extends State<OrderForm> {
               SizedBox(height: 20),
               Text('Delivery Information'),
               SizedBox(height: 10),
-              DropdownButtonFormField<int>(
-                items: customers.map((Customer value) {
-                  return new DropdownMenuItem<int>(
-                    value: customers.indexOf(value),
-                    child: new Text('${value.fname} ${value.lname}'),
-                  );
-                }).toList(),
-                decoration: InputDecoration(
-                  border: OutlineInputBorder(),
-                  labelText: 'Customer',
-                ),
-                onChanged: (val) {
-                  form.customer = customers[val];
-                },
+              Row(
+                children: <Widget>[
+                  IconButton(
+                    padding: EdgeInsets.all(20),
+                    onPressed: () {
+                      _showCustomerForm();
+                    },
+                    icon: Icon(Icons.person_add,
+                      color: Colors.black54,
+                    ),
+                  ),
+                  Expanded(
+                    child: DropdownButtonFormField<int>(
+                      items: customers.map((Customer value) {
+                        return new DropdownMenuItem<int>(
+                          value: customers.indexOf(value),
+                          child: new Text('${value.fname} ${value.lname}'),
+                        );
+                      }).toList(),
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(),
+                        labelText: 'Customer',
+                      ),
+                      onChanged: (val) {
+                        form.customer = customers[val];
+                      },
+                    ),
+                  )
+                ],
               ),
               SizedBox(height: 10),
               DropdownButtonFormField<int>(
@@ -353,7 +450,7 @@ class _OrderFormState extends State<OrderForm> {
                       _showErrorMessage('Woah!', responseMap['msg']);
                     }
                   } catch (Error) {
-                    _showErrorMessage('Woah!', 'Please fill up all the given information.');
+                    _showErrorMessage('Heyla!', 'Please fill up all the given information.');
                   }
 
                 },
