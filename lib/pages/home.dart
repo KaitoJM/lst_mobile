@@ -4,6 +4,8 @@ import '../components/order_row.dart';
 import 'package:lifesweettreatsordernotes/models/session.dart';
 import 'package:lifesweettreatsordernotes/models/order.dart';
 
+import 'package:lifesweettreatsordernotes/functions/fetchCurrentSession.dart';
+
 class OrderList extends StatefulWidget {
   @override
   _OrderListState createState() => _OrderListState();
@@ -117,10 +119,16 @@ class _OrderListState extends State<OrderList> {
 
     return Scaffold(
         floatingActionButton: FloatingActionButton(
-          onPressed: (){
-            Navigator.pushNamed(context, '/new_order', arguments: {
+          onPressed: () async {
+            dynamic received = await Navigator.pushNamed(context, '/new_order', arguments: {
               'session_id': session.id,
               'order': null
+            });
+
+            Session session_refresh = await new FetchCurrentSession().getData();
+
+            setState(() {
+              session.orders = session_refresh.orders;
             });
           },
           child: Icon(Icons.add),

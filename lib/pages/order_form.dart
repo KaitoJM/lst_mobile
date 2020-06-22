@@ -5,6 +5,9 @@ import 'dart:convert';
 import 'package:lifesweettreatsordernotes/models/order.dart';
 import 'package:lifesweettreatsordernotes/models/orderItem.dart';
 import 'package:lifesweettreatsordernotes/models/sessionProduct.dart';
+import 'package:lifesweettreatsordernotes/models/customer.dart';
+import 'package:lifesweettreatsordernotes/models/user.dart';
+import 'package:lifesweettreatsordernotes/pages/home.dart';
 
 class OrderForm extends StatefulWidget {
   @override
@@ -19,16 +22,19 @@ class _OrderFormState extends State<OrderForm> {
   var productQtyFieldController = TextEditingController();
 
   List<SessionProduct> productOption = List<SessionProduct>();
+  List<Customer> customers = List<Customer>();
+  List<User> users = List<User>();
 
   //form data
-  int customer;
-  int author;
+  FormData form = FormData(items: List<OrderItem>());
   List<OrderItem> items = List<OrderItem>();
 
   int productIndx;
   int qty;
 
   bool loadedOption = false;
+  bool loadedCustomers = false;
+  bool loadedUsers = false;
 
   void getProductOptions() async {
     Response response = await get('http://172.18.5.209:8080/api/get-sessions-products/${sessionId}');
@@ -49,9 +55,51 @@ class _OrderFormState extends State<OrderForm> {
       productOption = option_temp;
       loadedOption = true;
     });
-
     print('product option was loaded');
-    print(productOption);
+
+    Response responseCustomer = await get('http://172.18.5.209:8080/api/get-customers');
+    List<dynamic> customerArray = json.decode(responseCustomer.body);
+    List<Customer> customer_temp = List<Customer>();
+
+    customerArray.forEach((customer) {
+      customer_temp.add(new Customer(
+        id: customer['id'],
+        fname: customer['fname'],
+        lname: customer['lname'],
+        email: customer['email'],
+        phone: customer['phone'],
+        address: customer['address'],
+        gender: customer['gender']
+      ));
+    });
+
+    setState(() {
+      customers = customer_temp;
+      loadedCustomers = true;
+    });
+    print('customers option was loaded');
+
+    Response responseUser = await get('http://172.18.5.209:8080/api/get-users');
+    List<dynamic> userArray = json.decode(responseUser.body);
+    List<User> user_temp = List<User>();
+
+    userArray.forEach((user) {
+      user_temp.add(new User(
+          id: user['id'],
+          fname: user['fname'],
+          lname: user['lname'],
+          email: user['email'],
+          photo: user['photo']
+      ));
+    });
+
+    setState(() {
+      users = user_temp;
+      loadedUsers = true;
+    });
+    print('users option was loaded');
+
+
   }
 
   Widget totalAmount(List<OrderItem> items) {
@@ -105,18 +153,36 @@ class _OrderFormState extends State<OrderForm> {
               SizedBox(height: 20),
               Text('Delivery Information'),
               SizedBox(height: 10),
-              TextField(
+              DropdownButtonFormField<int>(
+                items: customers.map((Customer value) {
+                  return new DropdownMenuItem<int>(
+                    value: customers.indexOf(value),
+                    child: new Text('${value.fname} ${value.lname}'),
+                  );
+                }).toList(),
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: 'Customer',
                 ),
+                onChanged: (val) {
+                  form.customer = customers[val];
+                },
               ),
               SizedBox(height: 10),
-              TextField(
+              DropdownButtonFormField<int>(
+                items: users.map((User value) {
+                  return new DropdownMenuItem<int>(
+                    value: users.indexOf(value),
+                    child: new Text('${value.fname} ${value.lname}'),
+                  );
+                }).toList(),
                 decoration: InputDecoration(
                   border: OutlineInputBorder(),
                   labelText: 'Author',
                 ),
+                onChanged: (val) {
+                  form.userId = users[val].id;
+                },
               ),
               SizedBox(height: 10),
               Divider(height: 10),
@@ -164,10 +230,11 @@ class _OrderFormState extends State<OrderForm> {
               SizedBox(height: 10),
               RaisedButton.icon(
                 onPressed: (){
+                  OrderItem itemTemp = new OrderItem(sessionProductId: productOption[productIndx].id, productId: productOption[productIndx].productId, qty: qty, price: productOption[productIndx].price, productName: productOption[productIndx].productName);
+                  form.items.add(itemTemp);
+
                   setState(() {
-                    items.add(
-                      new OrderItem(productId: productOption[productIndx].productId, qty: qty, price: productOption[productIndx].price, productName: productOption[productIndx].productName)
-                    );
+                    items.add(itemTemp);
                   });
 
                   productQtyFieldController.clear();
@@ -227,8 +294,36 @@ class _OrderFormState extends State<OrderForm> {
               Divider(height: 10),
               SizedBox(height: 10),
               RaisedButton.icon(
-                onPressed: (){
+                onPressed: () async {
+                  print(form);
 
+                  Response response = await post('http://172.18.5.209:8080/api/submit-order',
+                    headers: <String, String>{
+                      'Content-Type': 'application/json; charset=UTF-8',
+                    },
+                    body: jsonEncode(<String, dynamic>{
+                      'session_id': sessionId,
+                      'customer_id': form.customer.id.toString(),
+                      'customer_fname': form.customer.fname,
+                      'customer_lname': form.customer.lname,
+                      'customer_email': form.customer.email,
+                      'customer_phone': form.customer.phone,
+                      'customer_address': form.customer.address,
+                      'customer_gender': form.customer.gender,
+                      'author_id': form.userId,
+                      'items': jsonEncode(form.items)
+                    })
+                  );
+
+                  Map responseMap = json.decode(response.body);
+                  print(responseMap);
+                  if (responseMap['err'] == 0) {
+                    Navigator.pop(context, true);
+//                    Navigator.pop(
+//                        context,
+//                        new MaterialPageRoute(
+//                            builder: (BuildContext context) => new OrderList()));
+                  }
                 },
                 padding: EdgeInsets.all(10),
                 icon: Icon(Icons.save,
@@ -247,4 +342,13 @@ class _OrderFormState extends State<OrderForm> {
       ),
     );
   }
+}
+
+class FormData {
+  Customer customer;
+  int userId;
+  List<OrderItem> items = List<OrderItem>();
+
+  FormData({this.customer, this.userId, this.items});
+
 }
