@@ -9,7 +9,7 @@ import 'package:lifesweettreatsordernotes/models/orderItem.dart';
 import 'package:lifesweettreatsordernotes/models/sessionProduct.dart';
 import 'package:lifesweettreatsordernotes/models/customer.dart';
 import 'package:lifesweettreatsordernotes/models/user.dart';
-import 'package:lifesweettreatsordernotes/pages/home.dart';
+import 'package:lifesweettreatsordernotes/models/gender.dart';
 
 class OrderForm extends StatefulWidget {
   @override
@@ -33,10 +33,16 @@ class _OrderFormState extends State<OrderForm> {
 
   int productIndx;
   int qty;
+  int selected_customer = 0;
 
   bool loadedOption = false;
   bool loadedCustomers = false;
   bool loadedUsers = false;
+
+  //customer
+  List<Gender> genders = FetchGender().get();
+  Customer customerForm = Customer(gender: 0);
+
 
   Future<void> _showErrorMessage(String title, String msg) async {
     return showDialog<void>(
@@ -68,7 +74,7 @@ class _OrderFormState extends State<OrderForm> {
   Future<void> _showCustomerForm() async {
     switch (await showDialog(
         context: context,
-//        barrierDismissible: false, // user must tap button!
+        barrierDismissible: false, // user must tap button!
         builder: (BuildContext context) {
 //          var height = MediaQuery.of(context).size.height;
           var width = MediaQuery.of(context).size.width;
@@ -87,7 +93,7 @@ class _OrderFormState extends State<OrderForm> {
                       children: <Widget>[
                         TextField(
                           onChanged: (val) {
-
+                            customerForm.fname = val;
                           },
                           decoration: InputDecoration(
                             border: OutlineInputBorder(),
@@ -97,7 +103,7 @@ class _OrderFormState extends State<OrderForm> {
                         SizedBox(height: 10),
                         TextField(
                           onChanged: (val) {
-
+                            customerForm.lname = val;
                           },
                           decoration: InputDecoration(
                             border: OutlineInputBorder(),
@@ -107,7 +113,7 @@ class _OrderFormState extends State<OrderForm> {
                         SizedBox(height: 10),
                         TextField(
                           onChanged: (val) {
-
+                            customerForm.email = val;
                           },
                           decoration: InputDecoration(
                             border: OutlineInputBorder(),
@@ -117,7 +123,7 @@ class _OrderFormState extends State<OrderForm> {
                         SizedBox(height: 10),
                         TextField(
                           onChanged: (val) {
-
+                            customerForm.phone = val;
                           },
                           decoration: InputDecoration(
                             border: OutlineInputBorder(),
@@ -127,13 +133,90 @@ class _OrderFormState extends State<OrderForm> {
                         SizedBox(height: 10),
                         TextField(
                           onChanged: (val) {
-
+                            customerForm.address = val;
                           },
                           decoration: InputDecoration(
                             border: OutlineInputBorder(),
                             labelText: 'Address',
                           ),
                         ),
+                        SizedBox(height: 10),
+                        DropdownButtonFormField<int>(
+                          items: genders.map((Gender value) {
+                            return new DropdownMenuItem<int>(
+                              value: value.id,
+                              child: new Text(value.name),
+                            );
+                          }).toList(),
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(),
+                            labelText: 'Sex',
+                          ),
+                          onChanged: (val) {
+                            customerForm.gender = val;
+                          },
+                        ),
+                        SizedBox(height: 10),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            RaisedButton.icon(
+                              onPressed: (){
+                                Navigator.of(context).pop();
+                              },
+                              icon: Icon(Icons.cancel, color: Colors.white),
+                              label: Text('Cancel',
+                                style: TextStyle(
+                                  color: Colors.white
+                                ),
+                              ),
+                              color: Colors.pinkAccent,
+                            ),
+                            RaisedButton.icon(
+                              onPressed: () async {
+                                try {
+                                  Response response = await post('http://172.18.5.209:8080/api/submit-customer',
+                                      headers: <String, String>{
+                                        'Content-Type': 'application/json; charset=UTF-8',
+                                      },
+                                      body: jsonEncode(<String, dynamic>{
+                                        'fname': customerForm.fname,
+                                        'lname': customerForm.lname,
+                                        'email': customerForm.email,
+                                        'phone': customerForm.phone,
+                                        'address': customerForm.address,
+                                        'gender': customerForm.gender,
+                                      })
+                                  );
+
+                                  Map responseMap = json.decode(response.body);
+                                  print(responseMap);
+                                  if (responseMap['err'] == 0) {
+                                    setState(() {
+                                      customerForm.id = responseMap['id'];
+                                      form.customer = customerForm;
+                                      customers.insert(0, customerForm);
+                                      customerForm = new Customer();
+                                    });
+                                    Navigator.pop(context, true);
+                                  } else {
+                                    _showErrorMessage('Woah!', responseMap['msg']);
+                                  }
+                                } catch (Error) {
+                                  _showErrorMessage('Heyla!', 'Please fill up all the given information.');
+                                }
+                              },
+                              icon: Icon(Icons.save_alt, color: Colors.white),
+                              label: Text('Add Customer',
+                                  style: TextStyle(
+                                      color: Colors.white
+                                  ),
+                              ),
+                              color: Colors.pinkAccent,
+                            )
+                          ],
+                        ),
+
                       ],
                     ),
                   ),
@@ -277,6 +360,7 @@ class _OrderFormState extends State<OrderForm> {
                   ),
                   Expanded(
                     child: DropdownButtonFormField<int>(
+                      value: selected_customer,
                       items: customers.map((Customer value) {
                         return new DropdownMenuItem<int>(
                           value: customers.indexOf(value),
@@ -288,6 +372,9 @@ class _OrderFormState extends State<OrderForm> {
                         labelText: 'Customer',
                       ),
                       onChanged: (val) {
+                        setState(() {
+                          selected_customer = val;
+                        });
                         form.customer = customers[val];
                       },
                     ),
