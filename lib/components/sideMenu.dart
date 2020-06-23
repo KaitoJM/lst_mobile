@@ -35,6 +35,7 @@ class SideMenu extends StatelessWidget {
                   leading: Icon(Icons.calendar_today),
                   title: Text('Sessions'),
                   onTap: (){
+                    Navigator.pop(context);
                     Navigator.pushNamed(context, '/sessions');
                   },
                 ),
