@@ -5,6 +5,7 @@ import 'package:lifesweettreatsordernotes/models/session.dart';
 import 'package:lifesweettreatsordernotes/models/order.dart';
 
 import 'package:lifesweettreatsordernotes/functions/fetchCurrentSession.dart';
+import 'package:lifesweettreatsordernotes/components/sideMenu.dart';
 
 class OrderList extends StatefulWidget {
   @override
@@ -140,6 +141,7 @@ class _OrderListState extends State<OrderList> {
           backgroundColor: Colors.pinkAccent[100],
           elevation: 0.0,
         ),
+        drawer: SideMenu(),
         body: Padding(
           padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
           child: Column(
