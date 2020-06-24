@@ -11,6 +11,8 @@ import 'package:lifesweettreatsordernotes/models/customer.dart';
 import 'package:lifesweettreatsordernotes/models/user.dart';
 import 'package:lifesweettreatsordernotes/models/gender.dart';
 
+import 'package:lifesweettreatsordernotes/globals.dart';
+
 class OrderForm extends StatefulWidget {
   @override
   _OrderFormState createState() => _OrderFormState();
@@ -175,7 +177,7 @@ class _OrderFormState extends State<OrderForm> {
                             RaisedButton.icon(
                               onPressed: () async {
                                 try {
-                                  Response response = await post('http://172.18.5.209:8080/api/submit-customer',
+                                  Response response = await post('${global.api_url}submit-customer',
                                       headers: <String, String>{
                                         'Content-Type': 'application/json; charset=UTF-8',
                                       },
@@ -231,7 +233,7 @@ class _OrderFormState extends State<OrderForm> {
   }
 
   void getProductOptions() async {
-    Response response = await get('http://172.18.5.209:8080/api/get-sessions-products/${sessionId}');
+    Response response = await get('${global.api_url}get-sessions-products/${sessionId}');
     List<dynamic> options = json.decode(response.body);
     List<SessionProduct> option_temp = List<SessionProduct>();
 
@@ -251,7 +253,7 @@ class _OrderFormState extends State<OrderForm> {
     });
     print('product option was loaded');
 
-    Response responseCustomer = await get('http://172.18.5.209:8080/api/get-customers');
+    Response responseCustomer = await get('${global.api_url}get-customers');
     List<dynamic> customerArray = json.decode(responseCustomer.body);
     List<Customer> customer_temp = List<Customer>();
 
@@ -273,7 +275,7 @@ class _OrderFormState extends State<OrderForm> {
     });
     print('customers option was loaded');
 
-    Response responseUser = await get('http://172.18.5.209:8080/api/get-users');
+    Response responseUser = await get('${global.api_url}get-users');
     List<dynamic> userArray = json.decode(responseUser.body);
     List<User> user_temp = List<User>();
 
@@ -511,7 +513,7 @@ class _OrderFormState extends State<OrderForm> {
                   print(form);
 
                   try {
-                    Response response = await post('http://172.18.5.209:8080/api/submit-order',
+                    Response response = await post('${global.api_url}submit-order',
                         headers: <String, String>{
                           'Content-Type': 'application/json; charset=UTF-8',
                         },

@@ -1,11 +1,14 @@
 import 'package:flutter/material.dart';
 import '../components/order_row.dart';
+import 'package:http/http.dart';
+import 'dart:convert';
 
 import 'package:lifesweettreatsordernotes/models/session.dart';
 import 'package:lifesweettreatsordernotes/models/order.dart';
 
 import 'package:lifesweettreatsordernotes/functions/fetchCurrentSession.dart';
 import 'package:lifesweettreatsordernotes/components/sideMenu.dart';
+import 'package:lifesweettreatsordernotes/globals.dart';
 
 class OrderList extends StatefulWidget {
   @override
@@ -15,6 +18,63 @@ class OrderList extends StatefulWidget {
 class _OrderListState extends State<OrderList> {
   Map data = {};
   Session session;
+
+
+  Future<bool> deleteConfirmation() async {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Delete Confirmation"),
+          content: new Text("Canceling will remove the selected order. \nDo you wish to continue?"),
+          actions: <Widget>[
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("NO"),
+              onPressed: () {
+                Navigator.of(context).pop(false);
+              },
+            ),
+            new FlatButton(
+              child: new Text("PROCEED"),
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  Future<void> _showErrorMessage(String title, String msg) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(msg),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   Future<void> OpenDialog(Order order) async {
     switch (await showDialog(
@@ -208,10 +268,30 @@ class _OrderListState extends State<OrderList> {
                     children: session.orders.map((order) {
                       return OrderRow(
                         order: order,
-                        delete: () {
-                          setState(() {
-                            session.orders.remove(order);
-                          });
+                        delete: () async {
+//                          bool del = await deleteConfirmation();
+//                          if (del) {
+                            Response response = await post('${global.api_url}delete-order',
+                              headers: <String, String>{
+                                'Content-Type': 'application/json; charset=UTF-8',
+                              },
+                                body: jsonEncode(<String, dynamic>{
+                                  'order_id': order.id
+                                })
+                            );
+
+                            Map responseMap = json.decode(response.body);
+                            print(responseMap);
+
+                            if (responseMap['err'] == 0) {
+                              setState(() {
+                                session.orders.remove(order);
+                              });
+                            } else {
+                              _showErrorMessage('Woah!', responseMap['msg']);
+                            }
+
+//                          }
                         },
                         openDetails: () {
                           OpenDialog(order);

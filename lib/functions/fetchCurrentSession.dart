@@ -5,9 +5,12 @@ import 'package:lifesweettreatsordernotes/models/session.dart';
 import 'package:lifesweettreatsordernotes/models/order.dart';
 import 'package:lifesweettreatsordernotes/models/orderItem.dart';
 
+import 'package:lifesweettreatsordernotes/globals.dart';
+
 class FetchCurrentSession {
   Future<Session> getData() async {
-    Response response = await get('http://172.18.5.209:8080/api/get-current-session');
+//    Response response = await get('http://172.18.5.209:8080/api/get-current-session');
+    Response response = await get('${global.api_url}get-current-session');
     Map session_map = json.decode(response.body);
 
     List<dynamic> orderArray = session_map['orders'];

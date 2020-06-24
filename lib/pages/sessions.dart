@@ -8,6 +8,8 @@ import 'package:lifesweettreatsordernotes/components/session_row.dart';
 import 'package:lifesweettreatsordernotes/functions/fetchCurrentSession.dart';
 import 'package:lifesweettreatsordernotes/models/order.dart';
 
+import 'package:lifesweettreatsordernotes/globals.dart';
+
 class SessionList extends StatefulWidget {
   @override
   _SessionListState createState() => _SessionListState();
@@ -24,7 +26,7 @@ class _SessionListState extends State<SessionList> {
       sCurrent.orders = sCurrent.orders;
     });
 
-    Response response = await get('http://172.18.5.209:8080/api/get-sessions');
+    Response response = await get('${global.api_url}get-sessions');
     Map sessions_map = json.decode(response.body);
 
     List<dynamic> sessionPending = sessions_map['preparation'];
