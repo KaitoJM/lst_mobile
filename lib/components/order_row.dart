@@ -5,10 +5,11 @@ enum rowOption { showItems, edit, remove }
 
 class OrderRow extends StatelessWidget {
   final Order order;
+  final Function edit;
   final Function delete;
   final Function openDetails;
 
-  OrderRow({this.order, this.delete, this.openDetails});
+  OrderRow({this.order, this.edit, this.delete, this.openDetails});
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +41,7 @@ class OrderRow extends StatelessWidget {
                     openDetails();
                   }
                   if (result == rowOption.edit) {
-                    print('edit');
+                    edit();
                   }
                   if (result == rowOption.remove) {
                     delete();
@@ -57,7 +58,7 @@ class OrderRow extends StatelessWidget {
                   ),
                   const PopupMenuItem<rowOption>(
                     value: rowOption.remove,
-                    child: Text('Cancel'),
+                    child: Text('Cancel order'),
                   ),
                 ],
               )

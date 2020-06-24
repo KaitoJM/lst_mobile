@@ -27,6 +27,7 @@ class FetchCurrentSession {
                 image: item['image'],
                 price: item['price'].toDouble(), //parse to double
                 productId: item['product_id'],
+                sessionProductId: item['session_product_id'],
                 productName: item['product'],
                 qty: item['qty'],
                 total: item['total'].toDouble()

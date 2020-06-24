@@ -495,6 +495,7 @@ class _OrderFormState extends State<OrderForm> {
                       ),
                       IconButton(
                         onPressed: () {
+                          form.items.remove(item);
                           setState(() {
                             items.remove(item);
                           });

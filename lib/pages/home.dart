@@ -268,6 +268,21 @@ class _OrderListState extends State<OrderList> {
                     children: session.orders.map((order) {
                       return OrderRow(
                         order: order,
+                        edit: () async {
+
+                          dynamic received = await Navigator.pushNamed(context, '/edit_order', arguments: {
+                            'session_id': session.id,
+                            'order_id': order.id,
+                            'customer_name': '${order.customerFName} ${order.customerLName}',
+                            'order_items': jsonEncode(order.items)
+                          });
+
+                          Session session_refresh = await new FetchCurrentSession().getData();
+
+                          setState(() {
+                            session.orders = session_refresh.orders;
+                          });
+                        },
                         delete: () async {
 //                          bool del = await deleteConfirmation();
 //                          if (del) {
