@@ -5,6 +5,7 @@ import 'package:http/http.dart';
 import 'dart:convert';
 import 'package:lifesweettreatsordernotes/models/session.dart';
 import 'package:lifesweettreatsordernotes/components/session_row.dart';
+import 'package:lifesweettreatsordernotes/components/session_ended_row.dart';
 import 'package:lifesweettreatsordernotes/functions/fetchCurrentSession.dart';
 import 'package:lifesweettreatsordernotes/models/order.dart';
 
@@ -18,7 +19,7 @@ class SessionList extends StatefulWidget {
 class _SessionListState extends State<SessionList> {
   List<Session> sPending = [];
   List<Session> sEnded = [];
-  Session sCurrent = Session(name: '', startDate: '', orders: List<Order>());
+  Session sCurrent = Session(name: '', startDate: '', endDate: '', orders: List<Order>());
 
   void getData() async {
     sCurrent = await new FetchCurrentSession().getData();
@@ -92,7 +93,7 @@ class _SessionListState extends State<SessionList> {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: (){
-          Navigator.pushNamed(context, '/sessions');
+          Navigator.pushNamed(context, '/new_session');
         },
         child: Icon(Icons.add),
         backgroundColor: Colors.pinkAccent[100],
@@ -178,7 +179,7 @@ class _SessionListState extends State<SessionList> {
               Expanded(
                 child: ListView(
                   children: sEnded.map((session) {
-                    return SessionRow(session: session);
+                    return SessionEndedRow(session: session);
                   }).toList(),
                 ),
               ),

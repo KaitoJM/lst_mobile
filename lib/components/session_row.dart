@@ -2,6 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lifesweettreatsordernotes/models/session.dart';
 
+enum rowOption { open, edit, remove }
+
 class SessionRow extends StatelessWidget {
   final Session session;
 
@@ -35,10 +37,37 @@ class SessionRow extends StatelessWidget {
                   ],
                 )
             ),
-            IconButton(
-              onPressed: (){},
-              icon: Icon(Icons.more_vert),
-            )
+            SizedBox(
+                width: 50,
+                height: 50,
+                child: PopupMenuButton<rowOption>(
+                  onSelected: (rowOption result) {
+                    if (result == rowOption.open) {
+//                      openDetails();
+                    }
+                    if (result == rowOption.edit) {
+//                      edit();
+                    }
+                    if (result == rowOption.remove) {
+//                      delete();
+                    }
+                  },
+                  itemBuilder: (BuildContext context) => <PopupMenuEntry<rowOption>>[
+                    const PopupMenuItem<rowOption>(
+                      value: rowOption.open,
+                      child: Text('Open'),
+                    ),
+                    const PopupMenuItem<rowOption>(
+                      value: rowOption.edit,
+                      child: Text('Edit order'),
+                    ),
+                    const PopupMenuItem<rowOption>(
+                      value: rowOption.remove,
+                      child: Text('Cancel order'),
+                    ),
+                  ],
+                )
+            ),
           ],
         ),
       ),
