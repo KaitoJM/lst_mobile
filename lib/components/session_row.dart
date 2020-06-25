@@ -2,14 +2,15 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lifesweettreatsordernotes/models/session.dart';
 
-enum rowOption { open, edit, remove }
+enum rowOption { view, open, edit, remove }
 
 class SessionRow extends StatelessWidget {
   final Session session;
   final Function delete;
   final Function edit;
+  final Function open;
 
-  SessionRow({this.session, this.delete, this.edit});
+  SessionRow({this.session, this.open, this.delete, this.edit});
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +46,7 @@ class SessionRow extends StatelessWidget {
                 child: PopupMenuButton<rowOption>(
                   onSelected: (rowOption result) {
                     if (result == rowOption.open) {
-//                      openDetails();
+                      open();
                     }
                     if (result == rowOption.edit) {
                       edit();
@@ -56,8 +57,12 @@ class SessionRow extends StatelessWidget {
                   },
                   itemBuilder: (BuildContext context) => <PopupMenuEntry<rowOption>>[
                     const PopupMenuItem<rowOption>(
+                      value: rowOption.view,
+                      child: Text('View'),
+                    ),
+                    const PopupMenuItem<rowOption>(
                       value: rowOption.open,
-                      child: Text('Open'),
+                      child: Text('Open Session'),
                     ),
                     const PopupMenuItem<rowOption>(
                       value: rowOption.edit,

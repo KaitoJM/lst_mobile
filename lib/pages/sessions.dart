@@ -24,7 +24,7 @@ class _SessionListState extends State<SessionList> {
   Session sCurrent = Session(name: '', startDate: '', endDate: '', orders: List<Order>());
 
   void getData() async {
-    sCurrent = await new FetchCurrentSession().getData();
+    sCurrent = await new FetchCurrentSession().getData(current_recommended: true);
     setState(() {
       sCurrent.orders = sCurrent.orders;
     });
@@ -113,6 +113,53 @@ class _SessionListState extends State<SessionList> {
     );
   }
 
+  void _showDialog(int session_id) {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Close Session"),
+          content: new Text("Are you sure to close this session? \nAre all orders paid already?"),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("Cancel"),
+              onPressed: () async {
+                Navigator.of(context).pop();
+              },
+            ),
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Yes Continue!"),
+              onPressed: () async {
+                Response response = await post('${global.api_url}close-session',
+                    headers: <String, String>{
+                      'Content-Type': 'application/json; charset=UTF-8',
+                    },
+                    body: jsonEncode(<String, dynamic>{
+                      'session_id': session_id
+                    })
+                );
+
+                Map responseMap = json.decode(response.body);
+                print(responseMap);
+
+                if (responseMap['err'] == 0) {
+                  getData();
+                } else {
+                  _showErrorMessage('Woah!', responseMap['msg']);
+                }
+
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   void initState() {
     super.initState();
@@ -170,7 +217,7 @@ class _SessionListState extends State<SessionList> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Text(
-                              sCurrent.name,
+                              ((sCurrent.name == '') || (sCurrent.name == null)) ? 'No Open Sessions \nat the Moment' : sCurrent.name,
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold
@@ -189,12 +236,40 @@ class _SessionListState extends State<SessionList> {
                           ],
                         ),
                       ),
-                      IconButton(
-                        onPressed: (){
-                          Navigator.pop(context);
-                        },
-                        icon: Icon(Icons.chevron_right),
-                      )
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: <Widget>[
+                          OutlineButton.icon(
+                            onPressed: (){
+                              if (sCurrent.id != null) {
+                                _showDialog(sCurrent.id);
+                              } else {
+                                _showErrorMessage('Oops!', 'Open sessions are empty!');
+                              }
+
+                            },
+                            icon: Icon(Icons.cancel, color: Colors.white),
+                            label: Text('Close',
+                              style: TextStyle(
+                                color: Colors.white
+                              ),
+                            ),
+                            borderSide: BorderSide(
+                              color: Colors.white
+                            ),
+                          ),
+                          SizedBox(
+                            width: 30,
+                            child: IconButton(
+                              onPressed: (){
+                                Navigator.pop(context);
+                              },
+                              icon: Icon(Icons.chevron_right, color: Colors.white),
+                            ),
+                          )
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -255,6 +330,29 @@ class _SessionListState extends State<SessionList> {
                       Navigator.pushNamed(context, '/new_session', arguments: {
                         'session': session
                       });
+                    },
+                    open: () async {
+                      if (sCurrent.id == null) {
+                        Response response = await post('${global.api_url}open-session',
+                            headers: <String, String>{
+                              'Content-Type': 'application/json; charset=UTF-8',
+                            },
+                            body: jsonEncode(<String, dynamic>{
+                              'session_id': session.id
+                            })
+                        );
+
+                        Map responseMap = json.decode(response.body);
+                        print(responseMap);
+
+                        if (responseMap['err'] == 0) {
+                          getData();
+                        } else {
+                          _showErrorMessage('Woah!', responseMap['msg']);
+                        }
+                      } else {
+                        _showErrorMessage('Oops!', 'Are you planning to open up multiple session at once? \n\nYou still have an open session left. \nPlease close all open session first to continue.');
+                      }
                     }
                   );
                 }).toList(),
@@ -265,7 +363,7 @@ class _SessionListState extends State<SessionList> {
                 child: Row(
                   children: <Widget>[
                     Expanded(
-                      child: Text('ENDED',
+                      child: Text('HISTORY',
                         style: TextStyle(
                             fontWeight: FontWeight.bold
                         ),

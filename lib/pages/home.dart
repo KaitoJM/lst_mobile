@@ -196,7 +196,7 @@ class _OrderListState extends State<OrderList> {
           backgroundColor: Colors.pinkAccent[100],
         ),
         appBar: AppBar(
-          title: Text('Today\'s Orders'),
+          title: Text((session.status == 1) ? 'Today\'s Orders' : (session.status == 0) ? 'Pending Session' : 'No Current Session'),
           centerTitle: true,
           backgroundColor: Colors.pinkAccent[100],
           elevation: 0.0,
@@ -209,13 +209,23 @@ class _OrderListState extends State<OrderList> {
             children: <Widget>[
               Padding(
                 padding: EdgeInsets.fromLTRB(0, 0, 0, 5),
-                child: Text(
-                  (session.name != null) ? session.name : '',
-                  style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.black54
-                  ),
-                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: <Widget>[
+                    Text(
+                      (session.name != null) ? session.name : '',
+                      style: TextStyle(
+                          fontSize: 20,
+                          color: Colors.black54
+                      ),
+                    ),
+                    OutlineButton.icon(
+                        onPressed: () {},
+                        icon: ((session.status == 1) ? Icon(Icons.cancel) : (session.status == 0) ? Icon(Icons.open_in_browser) : Icon(Icons.cancel)),
+                        label: Text((session.status == 1) ? 'Close' : (session.status == 0) ? 'Open' : ' --- '),
+                    )
+                  ],
+                )
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
