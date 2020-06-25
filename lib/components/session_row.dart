@@ -6,8 +6,10 @@ enum rowOption { open, edit, remove }
 
 class SessionRow extends StatelessWidget {
   final Session session;
+  final Function delete;
+  final Function edit;
 
-  SessionRow({this.session});
+  SessionRow({this.session, this.delete, this.edit});
 
   @override
   Widget build(BuildContext context) {
@@ -46,10 +48,10 @@ class SessionRow extends StatelessWidget {
 //                      openDetails();
                     }
                     if (result == rowOption.edit) {
-//                      edit();
+                      edit();
                     }
                     if (result == rowOption.remove) {
-//                      delete();
+                      delete();
                     }
                   },
                   itemBuilder: (BuildContext context) => <PopupMenuEntry<rowOption>>[
@@ -59,11 +61,11 @@ class SessionRow extends StatelessWidget {
                     ),
                     const PopupMenuItem<rowOption>(
                       value: rowOption.edit,
-                      child: Text('Edit order'),
+                      child: Text('Edit'),
                     ),
                     const PopupMenuItem<rowOption>(
                       value: rowOption.remove,
-                      child: Text('Cancel order'),
+                      child: Text('Remove'),
                     ),
                   ],
                 )

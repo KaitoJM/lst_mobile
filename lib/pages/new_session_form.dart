@@ -1,7 +1,9 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'dart:convert';
 
+import 'package:lifesweettreatsordernotes/models/session.dart';
 import 'package:lifesweettreatsordernotes/models/sessionProduct.dart';
 import 'package:lifesweettreatsordernotes/models/product.dart';
 
@@ -13,11 +15,11 @@ class NewSessionForm extends StatefulWidget {
 }
 
 class _NewSessionFormState extends State<NewSessionForm> {
+  dynamic data;
   List<Product> products = List<Product>();
   List<SessionProduct> productItems = List<SessionProduct>();
 
-  bool productsLoaded = false;
-  FormData form = FormData(products: List<SessionProduct>());
+  Session form = Session(startDate: '', products: List<SessionProduct>());
   Product selectedProduct;
 
   Future <List<Product>> getProducts() async {
@@ -36,15 +38,46 @@ class _NewSessionFormState extends State<NewSessionForm> {
         ));
       });
 
-      productsLoaded = true;
     });
+  }
+
+  Future<void> _showErrorMessage(String title, String msg) async {
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: false, // user must tap button!
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(msg),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            FlatButton(
+              child: Text('Ok'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    getProducts();
   }
 
   @override
   Widget build(BuildContext context) {
-    if (!productsLoaded) {
-      getProducts();
-    }
+    data = ModalRoute.of(context).settings.arguments;
+    form = (data != null) ? data['session'] : form;
 
     return Scaffold(
       appBar: AppBar(
@@ -60,7 +93,8 @@ class _NewSessionFormState extends State<NewSessionForm> {
             SizedBox(height: 20),
             Text('SESSION INFORMATION'),
             SizedBox(height: 10),
-            TextField(
+            TextFormField(
+              initialValue: form.name,
               onChanged: (val) {
                 form.name = val;
               },
@@ -71,14 +105,31 @@ class _NewSessionFormState extends State<NewSessionForm> {
             ),
             SizedBox(height: 10),
             SizedBox(height: 10),
-            TextField(
-              onChanged: (val) {
-                form.startDate = val;
-              },
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Schedule Date',
+            OutlineButton.icon(
+              padding: EdgeInsets.all(10),
+              icon: Icon(Icons.date_range, color: Colors.pinkAccent),
+              label: Text((form.startDate == null) ? 'Schedule Date' : '${form.startDate}',
+                style: TextStyle(
+                  color: Colors.pinkAccent
+                ),
               ),
+              borderSide: BorderSide(
+                color: Colors.pinkAccent,
+                width: 2
+              ),
+              onPressed: () {
+                showDatePicker(
+                    context: context,
+                    initialDate: DateTime.now(),
+                    firstDate: DateTime.now(),
+                    lastDate: DateTime(2022)
+                ).then((date) {
+                  print(date.toString());
+                  setState(() {
+                    form.startDate = date.toString();
+                  });
+                });
+              },
             ),
             SizedBox(height: 10),
             Divider(height: 10),
@@ -152,7 +203,28 @@ class _NewSessionFormState extends State<NewSessionForm> {
             SizedBox(height: 10),
             RaisedButton.icon(
               padding: EdgeInsets.all(10),
-              onPressed: (){},
+              onPressed: () async {
+                Response response = await post('${global.api_url}add-session',
+                    headers: <String, String>{
+                      'Content-Type': 'application/json; charset=UTF-8',
+                    },
+                    body: jsonEncode(<String, dynamic>{
+                      'id': form.id,
+                      'name': form.name,
+                      'start_date': form.startDate,
+                      'products': jsonEncode(form.products)
+                    })
+                );
+                print(response.body);
+                Map responseMap = json.decode(response.body);
+
+                if (responseMap['err'] == 0) {
+                  Navigator.pop(context, true);
+                } else {
+                  _showErrorMessage('Woah!', responseMap['msg']);
+                }
+
+              },
               icon: Icon(Icons.save_alt, color: Colors.white),
               label: Text(
                   'Schedule Session',
@@ -169,11 +241,14 @@ class _NewSessionFormState extends State<NewSessionForm> {
   }
 }
 
-class FormData {
-  List<SessionProduct> products = List<SessionProduct>();
-  String name;
-  String startDate;
-
-  FormData({this.name, this.startDate, this.products});
-}
+//class FormData {
+//  List<SessionProduct> products = List<SessionProduct>();
+//  int id;
+//  String name;
+//  String startDate;
+//  String endDate;
+//  int status;
+//
+//  FormData({this.id, this.name, this.startDate, this.products});
+//}
 
