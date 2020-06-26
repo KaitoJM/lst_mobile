@@ -1,5 +1,3 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'dart:convert';
@@ -12,6 +10,10 @@ import 'package:lifesweettreatsordernotes/models/user.dart';
 import 'package:lifesweettreatsordernotes/models/gender.dart';
 
 import 'package:lifesweettreatsordernotes/globals.dart';
+import 'package:lifesweettreatsordernotes/requests/orders.dart';
+import 'package:lifesweettreatsordernotes/requests/sessions.dart';
+import 'package:lifesweettreatsordernotes/requests/customers.dart';
+import 'package:lifesweettreatsordernotes/requests/users.dart';
 
 class OrderForm extends StatefulWidget {
   @override
@@ -177,24 +179,8 @@ class _OrderFormState extends State<OrderForm> {
                             RaisedButton.icon(
                               onPressed: () async {
                                 try {
-                                  print('Submiting Customer data');
-                                  Response response = await post('${global.api_url}submit-customer',
-                                      headers: <String, String>{
-                                        'Content-Type': 'application/json; charset=UTF-8',
-                                      },
-                                      body: jsonEncode(<String, dynamic>{
-                                        'fname': customerForm.fname,
-                                        'lname': customerForm.lname,
-                                        'email': customerForm.email,
-                                        'phone': customerForm.phone,
-                                        'address': customerForm.address,
-                                        'gender': customerForm.gender,
-                                      })
-                                  );
-                                  print('Customer finished process');
+                                  Map responseMap = await CustomersData().submitCustomer(customerForm.fname, customerForm.lname, customerForm.email, customerForm.phone, customerForm.address, customerForm.gender);
 
-                                  Map responseMap = json.decode(response.body);
-                                  print(responseMap);
                                   if (responseMap['err'] == 0) {
                                     setState(() {
                                       customerForm.id = responseMap['id'];
@@ -235,75 +221,31 @@ class _OrderFormState extends State<OrderForm> {
   }
 
   void getProductOptions() async {
-    print('Loading Products');
-    Response response = await get('${global.api_url}get-sessions-products/${sessionId}');
-    print('Loaded Products');
-    List<dynamic> options = json.decode(response.body);
-    List<SessionProduct> option_temp = List<SessionProduct>();
-
-    options.forEach((option) {
-      option_temp.add(new SessionProduct(
-          id: option['id'],
-          productId: option['product_id'],
-          productName: option['product_name'],
-          qty: option['quantity'],
-          price: option['price'].toDouble()
-      ));
-    });
+    List<SessionProduct> option_temp = await SessionsData().getSessionProducts(sessionId);
 
     setState(() {
       productOption = option_temp;
       loadedOption = true;
     });
+
     print('product option was loaded');
 
-    print('Loading Customers');
-    Response responseCustomer = await get('${global.api_url}get-customers');
-    print('Loaded Customers');
-    List<dynamic> customerArray = json.decode(responseCustomer.body);
-    List<Customer> customer_temp = List<Customer>();
-
-    customerArray.forEach((customer) {
-      customer_temp.add(new Customer(
-        id: customer['id'],
-        fname: customer['fname'],
-        lname: customer['lname'],
-        email: customer['email'],
-        phone: customer['phone'],
-        address: customer['address'],
-        gender: customer['gender']
-      ));
-    });
+    List<Customer> customer_temp = await CustomersData().getCustomers();
 
     setState(() {
       customers = customer_temp;
       loadedCustomers = true;
     });
+
     print('customers option was loaded');
 
-    print('Loading Users');
-    Response responseUser = await get('${global.api_url}get-users');
-    print('Loaded Users');
-    List<dynamic> userArray = json.decode(responseUser.body);
-    List<User> user_temp = List<User>();
-
-    userArray.forEach((user) {
-      user_temp.add(new User(
-          id: user['id'],
-          fname: user['fname'],
-          lname: user['lname'],
-          email: user['email'],
-          photo: user['photo']
-      ));
-    });
+    List<User> user_temp = await UsersData().getUsers();
 
     setState(() {
       users = user_temp;
       loadedUsers = true;
     });
     print('users option was loaded');
-
-
   }
 
   Widget totalAmount(List<OrderItem> items) {
@@ -519,31 +461,10 @@ class _OrderFormState extends State<OrderForm> {
               SizedBox(height: 10),
               RaisedButton.icon(
                 onPressed: () async {
-                  print(form);
-
                   try {
-                    print('Submiting Order');
-                    Response response = await post('${global.api_url}submit-order',
-                        headers: <String, String>{
-                          'Content-Type': 'application/json; charset=UTF-8',
-                        },
-                        body: jsonEncode(<String, dynamic>{
-                          'session_id': sessionId,
-                          'customer_id': form.customer.id.toString(),
-                          'customer_fname': form.customer.fname,
-                          'customer_lname': form.customer.lname,
-                          'customer_email': form.customer.email,
-                          'customer_phone': form.customer.phone,
-                          'customer_address': form.customer.address,
-                          'customer_gender': form.customer.gender,
-                          'author_id': form.userId,
-                          'items': jsonEncode(form.items)
-                        })
-                    );
-                    print('Submit finished.');
-
-                    Map responseMap = json.decode(response.body);
+                    Map responseMap = await OrdersData().submitOrder(sessionId, form.customer.id, form.customer.fname, form.customer.lname, form.customer.email, form.customer.phone, form.customer.address, form.customer.gender, form.userId, jsonEncode(form.items));
                     print(responseMap);
+
                     if (responseMap['err'] == 0) {
                       Navigator.pop(context, true);
                     } else {

@@ -190,4 +190,25 @@ class SessionsData {
 
     return json.decode(response.body);
   }
+
+  Future<List<SessionProduct>> getSessionProducts(int sessionId) async {
+    print('Loading session products...');
+    Response response = await get('${global.api_url}get-sessions-products/${sessionId}');
+    print('Loaded session products');
+
+    List<dynamic> options = json.decode(response.body);
+    List<SessionProduct> option_temp = List<SessionProduct>();
+
+    options.forEach((option) {
+      option_temp.add(new SessionProduct(
+          id: option['id'],
+          productId: option['product_id'],
+          productName: option['product_name'],
+          qty: option['quantity'],
+          price: option['price'].toDouble()
+      ));
+    });
+
+    return option_temp;
+  }
 }

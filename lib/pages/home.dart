@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../components/order_row.dart';
 import 'dart:convert';
 
 // models
@@ -12,7 +11,9 @@ import 'package:lifesweettreatsordernotes/models/order.dart';
 import 'package:lifesweettreatsordernotes/requests/sessions.dart';
 import 'package:lifesweettreatsordernotes/requests/orders.dart';
 
+//components
 import 'package:lifesweettreatsordernotes/components/sideMenu.dart';
+import '../components/order_row.dart';
 
 class OrderList extends StatefulWidget {
   @override

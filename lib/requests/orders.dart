@@ -1,12 +1,34 @@
 import 'package:http/http.dart';
 import 'dart:convert';
 
-import 'package:lifesweettreatsordernotes/models/order.dart';
-
 import 'package:lifesweettreatsordernotes/globals.dart';
 
 class OrdersData {
-  Future deleteOrderResponse({int order_id}) async {
+  Future<Map> submitOrder(int sessionId, int customerId, String customerName, String customerLName, String email, String phone, String address, int gender, int userId, orderItemsJson) async {
+    print('Submiting Order...');
+    Response response = await post('${global.api_url}submit-order',
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, dynamic>{
+          'session_id': sessionId,
+          'customer_id': customerId,
+          'customer_fname': customerName,
+          'customer_lname': customerLName,
+          'customer_email': email,
+          'customer_phone': phone,
+          'customer_address': address,
+          'customer_gender': gender,
+          'author_id': userId,
+          'items': orderItemsJson
+        })
+    );
+    print('Submit order finished.');
+
+    return json.decode(response.body);
+  }
+
+  Future<Map> deleteOrderResponse({int order_id}) async {
     print('Deleting order...');
     Response response = await post('${global.api_url}delete-order',
         headers: <String, String>{
