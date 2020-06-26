@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:lifesweettreatsordernotes/requests/sessions.dart';
 import '../components/order_row.dart';
 import 'package:http/http.dart';
 import 'dart:convert';
@@ -42,19 +43,7 @@ class _OrderListState extends State<OrderList> {
             new FlatButton(
               child: new Text("Yes Continue!"),
               onPressed: () async {
-                print('Loading session Action');
-                Response response = await post('${global.api_url}close-session',
-                    headers: <String, String>{
-                      'Content-Type': 'application/json; charset=UTF-8',
-                    },
-                    body: jsonEncode(<String, dynamic>{
-                      'session_id': session_id
-                    })
-                );
-                print('Loaded session Action');
-
-                Map responseMap = json.decode(response.body);
-                print(responseMap);
+                Map responseMap = await SessionsData().CloseSessionResponse(session_id: session_id);
 
                 if (responseMap['err'] == 0) {
                   Session session_refresh = await new FetchCurrentSession().getData();
@@ -102,19 +91,7 @@ class _OrderListState extends State<OrderList> {
             new FlatButton(
               child: new Text("Yes Continue!"),
               onPressed: () async {
-                print('Loading session Action');
-                Response response = await post('${global.api_url}open-session',
-                    headers: <String, String>{
-                      'Content-Type': 'application/json; charset=UTF-8',
-                    },
-                    body: jsonEncode(<String, dynamic>{
-                      'session_id': session_id
-                    })
-                );
-                print('Loaded session Action');
-
-                Map responseMap = json.decode(response.body);
-                print(responseMap);
+                Map responseMap = await SessionsData().OpenSessionRespose(session_id: session_id);
 
                 if (responseMap['err'] == 0) {
                   Session session_refresh = await new FetchCurrentSession().getData();

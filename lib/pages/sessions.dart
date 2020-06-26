@@ -1,17 +1,17 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
-import 'package:http/http.dart';
-import 'package:lifesweettreatsordernotes/models/product.dart';
-import 'dart:convert';
+
+//models
 import 'package:lifesweettreatsordernotes/models/session.dart';
 import 'package:lifesweettreatsordernotes/components/session_row.dart';
 import 'package:lifesweettreatsordernotes/components/session_ended_row.dart';
 import 'package:lifesweettreatsordernotes/functions/fetchCurrentSession.dart';
 import 'package:lifesweettreatsordernotes/models/order.dart';
+import 'package:lifesweettreatsordernotes/models/sessionType.dart';
 
-import 'package:lifesweettreatsordernotes/globals.dart';
-import 'package:lifesweettreatsordernotes/models/sessionProduct.dart';
+//data
+import 'package:lifesweettreatsordernotes/requests/sessions.dart';
 
 class SessionList extends StatefulWidget {
   @override
@@ -29,65 +29,11 @@ class _SessionListState extends State<SessionList> {
       sCurrent.orders = sCurrent.orders;
     });
 
-    print('Loading Sessions');
-    Response response = await get('${global.api_url}get-sessions');
-    print('Loaded Sessions');
-    Map sessions_map = json.decode(response.body);
-
-    List<dynamic> sessionPending = sessions_map['preparation'];
-    List<dynamic> sessionEnded = sessions_map['ended'];
-
-    print(sessionPending);
-    print(sessionEnded  );
-
-    List<dynamic> sessionPendingLists = sessionPending;
-    List<dynamic> sessionEndedLists = sessionEnded;
-
-    List<Session> pending_temp = List<Session>();
-    sessionPendingLists.forEach((element) {
-      List<SessionProduct> products = List<SessionProduct>();
-      List<dynamic> prodList = element['products'];
-
-      prodList.forEach((prod) {
-        products.add(
-            SessionProduct(
-                id: prod['id'],
-                productName: prod['product'],
-                price: prod['price'].toDouble(),
-                productId: prod['product_id'],
-                qty: (prod['qty'] != null) ? prod['qty'] : 0
-            )
-        );
-      });
-
-      pending_temp.add(
-          Session(
-              id: element['id'],
-              name: element['name'],
-              startDate: element['start_date'],
-              endDate: element['end_date'],
-              status: element['status'],
-              products: products
-          )
-      );
-    });
-
-    List<Session> ended_temp = List<Session>();
-    sessionEndedLists.forEach((element) {
-      ended_temp.add(
-          Session(
-              id: element['id'],
-              name: element['name'],
-              startDate: element['start_date'],
-              endDate: element['end_date'],
-              status: element['status']
-          )
-      );
-    });
+    SessionType sessions = await SessionsData().allSessions();
 
     setState(() {
-      sPending = pending_temp;
-      sEnded = ended_temp;
+      sPending = sessions.preparations;
+      sEnded = sessions.history;
     });
   }
 
@@ -138,17 +84,7 @@ class _SessionListState extends State<SessionList> {
             new FlatButton(
               child: new Text("Yes Continue!"),
               onPressed: () async {
-                Response response = await post('${global.api_url}close-session',
-                    headers: <String, String>{
-                      'Content-Type': 'application/json; charset=UTF-8',
-                    },
-                    body: jsonEncode(<String, dynamic>{
-                      'session_id': session_id
-                    })
-                );
-
-                Map responseMap = json.decode(response.body);
-                print(responseMap);
+                Map responseMap = await SessionsData().CloseSessionResponse(session_id: session_id);
 
                 if (responseMap['err'] == 0) {
                   getData();
@@ -311,17 +247,7 @@ class _SessionListState extends State<SessionList> {
                   return SessionRow (
                     session: session,
                     delete: () async {
-                      Response response = await post('${global.api_url}delete-session',
-                          headers: <String, String>{
-                            'Content-Type': 'application/json; charset=UTF-8',
-                          },
-                          body: jsonEncode(<String, dynamic>{
-                            'session_id': session.id
-                          })
-                      );
-
-                      Map responseMap = json.decode(response.body);
-                      print(responseMap);
+                      Map responseMap = await SessionsData().DeleteSessionRespose(session_id: session.id);
 
                       if (responseMap['err'] == 0) {
                         setState(() {
@@ -338,16 +264,7 @@ class _SessionListState extends State<SessionList> {
                     },
                     open: () async {
                       if (sCurrent.id == null) {
-                        Response response = await post('${global.api_url}open-session',
-                            headers: <String, String>{
-                              'Content-Type': 'application/json; charset=UTF-8',
-                            },
-                            body: jsonEncode(<String, dynamic>{
-                              'session_id': session.id
-                            })
-                        );
-
-                        Map responseMap = json.decode(response.body);
+                        Map responseMap = await SessionsData().OpenSessionRespose(session_id: session.id);
                         print(responseMap);
 
                         if (responseMap['err'] == 0) {
