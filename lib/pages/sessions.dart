@@ -29,7 +29,9 @@ class _SessionListState extends State<SessionList> {
       sCurrent.orders = sCurrent.orders;
     });
 
+    print('Loading Sessions');
     Response response = await get('${global.api_url}get-sessions');
+    print('Loaded Sessions');
     Map sessions_map = json.decode(response.body);
 
     List<dynamic> sessionPending = sessions_map['preparation'];
@@ -41,48 +43,51 @@ class _SessionListState extends State<SessionList> {
     List<dynamic> sessionPendingLists = sessionPending;
     List<dynamic> sessionEndedLists = sessionEnded;
 
-    setState(() {
-      sPending.clear();
-      sessionPendingLists.forEach((element) {
-        List<SessionProduct> products = List<SessionProduct>();
-        List<dynamic> prodList = element['products'];
+    List<Session> pending_temp = List<Session>();
+    sessionPendingLists.forEach((element) {
+      List<SessionProduct> products = List<SessionProduct>();
+      List<dynamic> prodList = element['products'];
 
-        prodList.forEach((prod) {
-          products.add(
+      prodList.forEach((prod) {
+        products.add(
             SessionProduct(
-              id: prod['id'],
-              productName: prod['product'],
-              price: prod['price'].toDouble(),
-              productId: prod['product_id'],
-              qty: (prod['qty'] != null) ? prod['qty'] : 0
-            )
-          );
-        });
-
-        sPending.add(
-            Session(
-                id: element['id'],
-                name: element['name'],
-                startDate: element['start_date'],
-                endDate: element['end_date'],
-                status: element['status'],
-                products: products
+                id: prod['id'],
+                productName: prod['product'],
+                price: prod['price'].toDouble(),
+                productId: prod['product_id'],
+                qty: (prod['qty'] != null) ? prod['qty'] : 0
             )
         );
       });
 
-      sEnded.clear();
-      sessionEndedLists.forEach((element) {
-        sEnded.add(
-            Session(
-                id: element['id'],
-                name: element['name'],
-                startDate: element['start_date'],
-                endDate: element['end_date'],
-                status: element['status']
-            )
-        );
-      });
+      pending_temp.add(
+          Session(
+              id: element['id'],
+              name: element['name'],
+              startDate: element['start_date'],
+              endDate: element['end_date'],
+              status: element['status'],
+              products: products
+          )
+      );
+    });
+
+    List<Session> ended_temp = List<Session>();
+    sessionEndedLists.forEach((element) {
+      ended_temp.add(
+          Session(
+              id: element['id'],
+              name: element['name'],
+              startDate: element['start_date'],
+              endDate: element['end_date'],
+              status: element['status']
+          )
+      );
+    });
+
+    setState(() {
+      sPending = pending_temp;
+      sEnded = ended_temp;
     });
   }
 

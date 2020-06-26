@@ -177,6 +177,7 @@ class _OrderFormState extends State<OrderForm> {
                             RaisedButton.icon(
                               onPressed: () async {
                                 try {
+                                  print('Submiting Customer data');
                                   Response response = await post('${global.api_url}submit-customer',
                                       headers: <String, String>{
                                         'Content-Type': 'application/json; charset=UTF-8',
@@ -190,6 +191,7 @@ class _OrderFormState extends State<OrderForm> {
                                         'gender': customerForm.gender,
                                       })
                                   );
+                                  print('Customer finished process');
 
                                   Map responseMap = json.decode(response.body);
                                   print(responseMap);
@@ -233,7 +235,9 @@ class _OrderFormState extends State<OrderForm> {
   }
 
   void getProductOptions() async {
+    print('Loading Products');
     Response response = await get('${global.api_url}get-sessions-products/${sessionId}');
+    print('Loaded Products');
     List<dynamic> options = json.decode(response.body);
     List<SessionProduct> option_temp = List<SessionProduct>();
 
@@ -253,7 +257,9 @@ class _OrderFormState extends State<OrderForm> {
     });
     print('product option was loaded');
 
+    print('Loading Customers');
     Response responseCustomer = await get('${global.api_url}get-customers');
+    print('Loaded Customers');
     List<dynamic> customerArray = json.decode(responseCustomer.body);
     List<Customer> customer_temp = List<Customer>();
 
@@ -275,7 +281,9 @@ class _OrderFormState extends State<OrderForm> {
     });
     print('customers option was loaded');
 
+    print('Loading Users');
     Response responseUser = await get('${global.api_url}get-users');
+    print('Loaded Users');
     List<dynamic> userArray = json.decode(responseUser.body);
     List<User> user_temp = List<User>();
 
@@ -514,6 +522,7 @@ class _OrderFormState extends State<OrderForm> {
                   print(form);
 
                   try {
+                    print('Submiting Order');
                     Response response = await post('${global.api_url}submit-order',
                         headers: <String, String>{
                           'Content-Type': 'application/json; charset=UTF-8',
@@ -531,6 +540,7 @@ class _OrderFormState extends State<OrderForm> {
                           'items': jsonEncode(form.items)
                         })
                     );
+                    print('Submit finished.');
 
                     Map responseMap = json.decode(response.body);
                     print(responseMap);

@@ -11,6 +11,7 @@ import 'package:lifesweettreatsordernotes/models/sessionProduct.dart';
 class FetchCurrentSession {
   Future<Session> getData({current_recommended: false}) async {
 //    Response response = await get('http://172.18.5.209:8080/api/get-current-session');
+    print('Loading Current Session');
     String url = '${global.api_url}get-current-session';
 
     if (current_recommended) {
@@ -18,6 +19,8 @@ class FetchCurrentSession {
     }
 
     Response response = await get(url);
+
+    print('Loaded Current Session');
 
     if (json.decode(response.body).length > 0) {
       Map session_map = json.decode(response.body);
