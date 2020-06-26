@@ -88,7 +88,7 @@ class _EditOrderItemsState extends State<EditOrderItems> {
     });
 
     return Text(
-      'TOTAL: ${total.toString()}',
+      'TOTAL: ₱${total.toString()}',
       style: TextStyle(
           fontWeight: FontWeight.bold,
           fontSize: 18
@@ -224,32 +224,98 @@ class _EditOrderItemsState extends State<EditOrderItems> {
               SizedBox(height: 10),
               Column(
                   children: orderItems.map((item) {
-                    return Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: <Widget>[
-                        Expanded(flex: 1, child: Text(item.qty.toString())),
-                        Expanded(flex: 8, child: Text(item.productName)),
-                        Expanded(flex: 2, child: Text('x ${item.price}')),
-                        Expanded(
-                            flex: 2,
-                            child: Text(
-                              '${item.price * item.qty}',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold
-                              ),
-                            )
-                        ),
-                        IconButton(
-                          onPressed: () {
-                            form.items.remove(item);
+                    return Container(
+                      margin: EdgeInsets.fromLTRB(0, 0, 0, 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: <Widget>[
+                          Expanded(
+                            child: Column(
+                              children: <Widget>[
+                                Text(item.productName),
+                                Container(
+                                  padding: EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment: CrossAxisAlignment.center,
+                                    children: <Widget>[
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.circular(8),
+                                          border: Border.all(color: Colors.amber, width: 1, style: BorderStyle.solid),
+                                          color: Colors.amber[100],
+                                        ),
+                                        child: Row(
+                                          mainAxisAlignment: MainAxisAlignment.start,
+                                          crossAxisAlignment: CrossAxisAlignment.center,
+                                          children: <Widget>[
+                                            SizedBox(
+                                              width: 50,
+                                              child: IconButton(
+                                                color: Colors.black45,
+                                                onPressed: () {
+                                                  setState(() {
+                                                    item.qty--;
+                                                  });
+                                                },
+                                                icon: Icon(Icons.remove),
+                                              ),
+                                            ),
+                                            SizedBox(
+                                                width: 30,
+                                                child: Text(item.qty.toString(),
+                                                  textAlign: TextAlign.center,
+                                                  style: TextStyle(
+                                                    fontSize: 25,
+                                                    fontWeight: FontWeight.bold,
+                                                    color: Colors.black45
+                                                  ),
+                                                )
+                                            ),
+                                            SizedBox(
+                                              height: 50,
+                                              child: IconButton(
+                                                color: Colors.black45,
+                                                onPressed: () {
+                                                  setState(() {
+                                                    item.qty++;
+                                                  });
+                                                },
+                                                icon: Icon(Icons.add),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                      SizedBox(width: 50),
+                                      Expanded(flex: 1, child: Text('x ${item.price}')),
+                                      Expanded(
+                                          child: Text(
+                                            '₱${item.price * item.qty}',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold
+                                            ),
+                                          )
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                            ),
+                          ),
+                          IconButton(
+                            onPressed: () {
+                              form.items.remove(item);
 
-                            setState(() {
-                              orderItems.remove(item);
-                            });
-                          },
-                          icon: Icon(Icons.clear),
-                        )
-                      ],
+                              setState(() {
+                                orderItems.remove(item);
+                              });
+                            },
+                            icon: Icon(Icons.clear),
+                          ),
+                        ],
+                      ),
                     );
                   }).toList()
               ),

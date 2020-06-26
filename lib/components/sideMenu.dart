@@ -8,11 +8,15 @@ class SideMenu extends StatelessWidget {
       child: Column(
         children: <Widget>[
           Container(
-            padding: EdgeInsets.all(20),
+            width: 310,
+            padding: EdgeInsets.fromLTRB(0, 50, 0, 25),
             color: Colors.pinkAccent[100],
             child: Column(
               children: <Widget>[
-                Image(image: AssetImage('assets/lstlogo.png'))
+                SizedBox(
+                    width: 150,
+                    child: Image(image: AssetImage('assets/lstlogo.png'))
+                )
               ],
             )
           ),

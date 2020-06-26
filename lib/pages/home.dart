@@ -1,3 +1,6 @@
+import 'dart:async';
+
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../components/order_row.dart';
 import 'package:http/http.dart';
@@ -19,6 +22,121 @@ class _OrderListState extends State<OrderList> {
   Map data = {};
   Session session;
 
+  void _showDialogCloseSession(int session_id) {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Close Session"),
+          content: new Text("This action will keep this session to history and make it non-editable. \nPlease make sure all orders are paid and set. \nDo you wish to continue?"),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("Cancel"),
+              onPressed: () async {
+                Navigator.of(context).pop();
+              },
+            ),
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Yes Continue!"),
+              onPressed: () async {
+                Response response = await post('${global.api_url}close-session',
+                    headers: <String, String>{
+                      'Content-Type': 'application/json; charset=UTF-8',
+                    },
+                    body: jsonEncode(<String, dynamic>{
+                      'session_id': session_id
+                    })
+                );
+
+                Map responseMap = json.decode(response.body);
+                print(responseMap);
+
+                if (responseMap['err'] == 0) {
+                  Session session_refresh = await new FetchCurrentSession().getData();
+
+                  setState(() {
+                    session.id = session_refresh.id;
+                    session.orders = session_refresh.orders;
+                    session.name = session_refresh.name;
+                    session.startDate = session_refresh.startDate;
+                    session.products = session_refresh.products;
+                    session.endDate = session_refresh.endDate;
+                    session.status = session_refresh.status;
+
+                  });
+                } else {
+                  _showErrorMessage('Woah!', responseMap['msg']);
+                }
+
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
+  void _showDialogOpenSession(int session_id) {
+    // flutter defined function
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        // return object of type Dialog
+        return AlertDialog(
+          title: new Text("Open Session"),
+          content: new Text("Are you sure to open this session? \nAre all available product's stock already set?"),
+          actions: <Widget>[
+            new FlatButton(
+              child: new Text("Cancel"),
+              onPressed: () async {
+                Navigator.of(context).pop();
+              },
+            ),
+            // usually buttons at the bottom of the dialog
+            new FlatButton(
+              child: new Text("Yes Continue!"),
+              onPressed: () async {
+                Response response = await post('${global.api_url}open-session',
+                    headers: <String, String>{
+                      'Content-Type': 'application/json; charset=UTF-8',
+                    },
+                    body: jsonEncode(<String, dynamic>{
+                      'session_id': session_id
+                    })
+                );
+
+                Map responseMap = json.decode(response.body);
+                print(responseMap);
+
+                if (responseMap['err'] == 0) {
+                  Session session_refresh = await new FetchCurrentSession().getData();
+
+                  setState(() {
+                    session.id = session_refresh.id;
+                    session.orders = session_refresh.orders;
+                    session.name = session_refresh.name;
+                    session.startDate = session_refresh.startDate;
+                    session.products = session_refresh.products;
+                    session.endDate = session_refresh.endDate;
+                    session.status = session_refresh.status;
+
+                  });
+                } else {
+                  _showErrorMessage('Woah!', responseMap['msg']);
+                }
+
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   Future<bool> deleteConfirmation() async {
     // flutter defined function
@@ -164,7 +282,7 @@ class _OrderListState extends State<OrderList> {
     });
 
     return Text(
-      total.toString(),
+      '₱${total.toString()}',
       style: TextStyle(
           fontWeight: FontWeight.bold,
           fontSize: 20
@@ -189,7 +307,14 @@ class _OrderListState extends State<OrderList> {
             Session session_refresh = await new FetchCurrentSession().getData();
 
             setState(() {
+              session.id = session_refresh.id;
               session.orders = session_refresh.orders;
+              session.name = session_refresh.name;
+              session.startDate = session_refresh.startDate;
+              session.products = session_refresh.products;
+              session.endDate = session_refresh.endDate;
+              session.status = session_refresh.status;
+
             });
           },
           child: Icon(Icons.add),
@@ -220,53 +345,71 @@ class _OrderListState extends State<OrderList> {
                       ),
                     ),
                     OutlineButton.icon(
-                        onPressed: () {},
+                        onPressed: () {
+                          if (session.status == 1) {
+                            // to close
+                            _showDialogCloseSession(session.id);
+                          } else if (session.status == 0) {
+                            //to open
+                            _showDialogOpenSession(session.id);
+                          } else {
+                            _showErrorMessage('Oops!', 'Invalid session.');
+                          }
+                        },
                         icon: ((session.status == 1) ? Icon(Icons.cancel) : (session.status == 0) ? Icon(Icons.open_in_browser) : Icon(Icons.cancel)),
                         label: Text((session.status == 1) ? 'Close' : (session.status == 0) ? 'Open' : ' --- '),
                     )
                   ],
                 )
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: <Widget>[
-                  Expanded(
-                    flex: 1,
-                    child: FlatButton(
-                      onPressed: (){},
-                      child: Text('All',
-                        style: TextStyle(
-                            color: Colors.white
+              Container(
+                height: 110,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: session.products.map((product) {
+                    return Expanded(
+                      flex: 1,
+                      child: Container(
+                        margin: EdgeInsets.all(3),
+                        height: 80,
+                        padding: EdgeInsets.symmetric(vertical: 7, horizontal: 10),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Text((session.status == 1) ? '${product.totalOrderQtyOrdered}/${product.qty}' : (session.status == 0) ? '${product.totalOrderQtyOrdered}' : '',
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: (session.status == 1) ? 15 : (session.status == 0) ? 30 : 30,
+                                color: Colors.white
+                              ),
+                            ),
+                            Text((session.status == 1) ? '₱${product.totalOrderAmount}' : (session.status == 0) ? '' : '',
+                              style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: (session.status == 1) ? 15 : 0,
+                                  color: Colors.white
+                              ),
+                            ),
+                            SizedBox(height: 5),
+                            Text('${product.productName}',
+                              style: TextStyle(
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                      color: Colors.pinkAccent,
-                    ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: FlatButton(
-                      onPressed: (){},
-                      child: Text('Mango'),
-                      color: Colors.amber,
-                    ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: FlatButton(
-                      onPressed: (){},
-                      child: Text('Choco'),
-                      color: Colors.amber,
-                    ),
-                  ),
-                  Expanded(
-                    flex: 2,
-                    child: FlatButton(
-                      onPressed: (){},
-                      child: Text('Graham'),
-                      color: Colors.amber,
-                    ),
-                  ),
-                ],
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(5),
+                          color: Colors.amber[300],
+                          boxShadow: [
+                            BoxShadow(color: Colors.amber, spreadRadius: 1),
+                          ],
+                        ),
+                      )
+                    );
+                  }).toList(),
+                ),
               ),
               Divider(
                 height: 20,
@@ -274,55 +417,81 @@ class _OrderListState extends State<OrderList> {
               ),
               Expanded(
                 child: Container(
-                  child: ListView(
-                    children: session.orders.map((order) {
-                      return OrderRow(
-                        order: order,
-                        edit: () async {
+                  child: RefreshIndicator(
+                    onRefresh: () async {
+                      Session session_refresh = await new FetchCurrentSession().getData();
 
-                          dynamic received = await Navigator.pushNamed(context, '/edit_order', arguments: {
-                            'session_id': session.id,
-                            'order_id': order.id,
-                            'customer_name': '${order.customerFName} ${order.customerLName}',
-                            'order_items': jsonEncode(order.items)
-                          });
+                      setState(() {
+                        session.id = session_refresh.id;
+                        session.orders = session_refresh.orders;
+                        session.name = session_refresh.name;
+                        session.startDate = session_refresh.startDate;
+                        session.products = session_refresh.products;
+                        session.endDate = session_refresh.endDate;
+                        session.status = session_refresh.status;
+                      });
 
-                          Session session_refresh = await new FetchCurrentSession().getData();
+                      print('asdsd');
 
-                          setState(() {
-                            session.orders = session_refresh.orders;
-                          });
-                        },
-                        delete: () async {
+                      return false;
+                    },
+                    child: ListView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      children: session.orders.map((order) {
+                        return OrderRow(
+                          order: order,
+                          edit: () async {
+
+                            dynamic received = await Navigator.pushNamed(context, '/edit_order', arguments: {
+                              'session_id': session.id,
+                              'order_id': order.id,
+                              'customer_name': '${order.customerFName} ${order.customerLName}',
+                              'order_items': jsonEncode(order.items)
+                            });
+
+                            Session session_refresh = await new FetchCurrentSession().getData();
+
+                            setState(() {
+                              session.id = session_refresh.id;
+                              session.orders = session_refresh.orders;
+                              session.name = session_refresh.name;
+                              session.startDate = session_refresh.startDate;
+                              session.products = session_refresh.products;
+                              session.endDate = session_refresh.endDate;
+                              session.status = session_refresh.status;
+                            });
+                          },
+                          delete: () async {
 //                          bool del = await deleteConfirmation();
 //                          if (del) {
-                            Response response = await post('${global.api_url}delete-order',
-                              headers: <String, String>{
-                                'Content-Type': 'application/json; charset=UTF-8',
-                              },
-                                body: jsonEncode(<String, dynamic>{
-                                  'order_id': order.id
-                                })
-                            );
+                              Response response = await post('${global.api_url}delete-order',
+                                headers: <String, String>{
+                                  'Content-Type': 'application/json; charset=UTF-8',
+                                },
+                                  body: jsonEncode(<String, dynamic>{
+                                    'order_id': order.id
+                                  })
+                              );
 
-                            Map responseMap = json.decode(response.body);
-                            print(responseMap);
+                              Map responseMap = json.decode(response.body);
+                              print(responseMap);
 
-                            if (responseMap['err'] == 0) {
-                              setState(() {
-                                session.orders.remove(order);
-                              });
-                            } else {
-                              _showErrorMessage('Woah!', responseMap['msg']);
-                            }
+                              if (responseMap['err'] == 0) {
+                                setState(() {
+                                  session.orders.remove(order);
+                                });
+                              } else {
+                                _showErrorMessage('Woah!', responseMap['msg']);
+                              }
 
 //                          }
-                        },
-                        openDetails: () {
-                          OpenDialog(order);
-                        }
-                      );
-                    }).toList(),
+                          },
+                          openDetails: () {
+                            OpenDialog(order);
+                          }
+                        );
+                      }).toList(),
+                    ),
                   ),
                 ),
               ),

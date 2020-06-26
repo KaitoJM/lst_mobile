@@ -31,7 +31,7 @@ class OrderRow extends StatelessWidget {
             Expanded(
               child: Text('${order.customerFName} ${order.customerLName}'),
             ),
-            Text(order.total.toString()),
+            Text('₱${order.total.toString()}'),
             SizedBox(
               width: 30,
               height: 30,

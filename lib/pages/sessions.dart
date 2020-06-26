@@ -290,7 +290,7 @@ class _SessionListState extends State<SessionList> {
                       height: 30,
                       child: Chip(
                         label: Text(
-                          '${sPending.length.toString()}',
+                          ' ${sPending.length.toString()} ',
                           style: TextStyle(
                             color: Colors.white
                           ),

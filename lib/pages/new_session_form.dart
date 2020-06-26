@@ -185,6 +185,23 @@ class _NewSessionFormState extends State<NewSessionForm> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: <Widget>[
                       Expanded(flex: 8, child: Text(item.productName)),
+                      Expanded(
+                        flex: 2,
+                        child: TextFormField(
+                          initialValue: item.qty.toString(),
+                          onChanged: (val) {
+                            setState(() {
+                              form.products[form.products.indexOf(item)].qty = int.parse(val);
+                            });
+                          },
+                          keyboardType: TextInputType.number,
+                          decoration: InputDecoration(
+                            contentPadding: EdgeInsets.all(0),
+                            labelText: 'Qty',
+                          ),
+                        ),
+                      ),
+                      SizedBox(width: 10),
                       Expanded(flex: 2, child: Text('${item.price}')),
                       IconButton(
                         onPressed: () {

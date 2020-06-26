@@ -6,6 +6,7 @@ import 'package:lifesweettreatsordernotes/models/order.dart';
 import 'package:lifesweettreatsordernotes/models/orderItem.dart';
 
 import 'package:lifesweettreatsordernotes/globals.dart';
+import 'package:lifesweettreatsordernotes/models/sessionProduct.dart';
 
 class FetchCurrentSession {
   Future<Session> getData({current_recommended: false}) async {
@@ -58,9 +59,28 @@ class FetchCurrentSession {
         ));
       });
 
-      return Session(id: session_map['id'], name: session_map['name'], startDate: session_map['start_date'], endDate: session_map['end_date'], status: session_map['status'], orders: orders);
+      List<dynamic> productArray = session_map['products'];
+      List<SessionProduct> products = List<SessionProduct>();
+
+      productArray.forEach((product) {
+        products.add(new SessionProduct(
+            id: product['id'],
+            productName: product['product'],
+            productId: product['product_id'],
+            price: product['price'].toDouble(),
+            qty: product['qty'],
+            totalOrderQty: product['total_order_qty'],
+            totalOrderQtyOrdered: product['total_order_qty_ordered'],
+            totalOrderQtyPaid: product['total_order_qty_paid'],
+            totalOrderAmount: product['total_order_amount'].toDouble(),
+            totalOrderOrdered: product['total_order_ordered'].toDouble(),
+            totalOrderPaid: product['total_order_paid'].toDouble(),
+        ));
+      });
+
+      return Session(id: session_map['id'], name: session_map['name'], startDate: session_map['start_date'], endDate: session_map['end_date'], status: session_map['status'], orders: orders, products: products);
     } else {
-      return Session(name: '', startDate: '', orders: List<Order>());
+      return Session(name: '', startDate: '', orders: List<Order>(), products: List<SessionProduct>());
     }
   }
 }
