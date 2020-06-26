@@ -58,7 +58,9 @@ class _EditOrderItemsState extends State<EditOrderItems> {
   }
 
   void getProductOptions() async {
+    print('Loading products');
     Response response = await get('${global.api_url}get-sessions-products/${session_id}');
+    print('Loaded products');
     List<dynamic> options = json.decode(response.body);
     List<SessionProduct> option_temp = List<SessionProduct>();
 
@@ -325,6 +327,7 @@ class _EditOrderItemsState extends State<EditOrderItems> {
               RaisedButton.icon(
                 onPressed: () async {
                   try {
+                    print('Loading order');
                     Response response = await post('${global.api_url}update-order',
                         headers: <String, String>{
                           'Content-Type': 'application/json; charset=UTF-8',
@@ -334,6 +337,7 @@ class _EditOrderItemsState extends State<EditOrderItems> {
                           'items': jsonEncode(form.items)
                         })
                     );
+                    print('Loaded Order');
 
                     Map responseMap = json.decode(response.body);
                     print(responseMap);

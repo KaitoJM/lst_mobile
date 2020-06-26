@@ -42,6 +42,7 @@ class _OrderListState extends State<OrderList> {
             new FlatButton(
               child: new Text("Yes Continue!"),
               onPressed: () async {
+                print('Loading session Action');
                 Response response = await post('${global.api_url}close-session',
                     headers: <String, String>{
                       'Content-Type': 'application/json; charset=UTF-8',
@@ -50,6 +51,7 @@ class _OrderListState extends State<OrderList> {
                       'session_id': session_id
                     })
                 );
+                print('Loaded session Action');
 
                 Map responseMap = json.decode(response.body);
                 print(responseMap);
@@ -100,6 +102,7 @@ class _OrderListState extends State<OrderList> {
             new FlatButton(
               child: new Text("Yes Continue!"),
               onPressed: () async {
+                print('Loading session Action');
                 Response response = await post('${global.api_url}open-session',
                     headers: <String, String>{
                       'Content-Type': 'application/json; charset=UTF-8',
@@ -108,6 +111,7 @@ class _OrderListState extends State<OrderList> {
                       'session_id': session_id
                     })
                 );
+                print('Loaded session Action');
 
                 Map responseMap = json.decode(response.body);
                 print(responseMap);
@@ -464,6 +468,7 @@ class _OrderListState extends State<OrderList> {
                           delete: () async {
 //                          bool del = await deleteConfirmation();
 //                          if (del) {
+                            print('Loading delete Action');
                               Response response = await post('${global.api_url}delete-order',
                                 headers: <String, String>{
                                   'Content-Type': 'application/json; charset=UTF-8',
@@ -472,6 +477,7 @@ class _OrderListState extends State<OrderList> {
                                     'order_id': order.id
                                   })
                               );
+                              print('loaded delete action');
 
                               Map responseMap = json.decode(response.body);
                               print(responseMap);

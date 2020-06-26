@@ -23,7 +23,9 @@ class _NewSessionFormState extends State<NewSessionForm> {
   Product selectedProduct;
 
   Future <List<Product>> getProducts() async {
+    print('Loading products');
     Response response = await get('${global.api_url}get-products');
+    print('Loaded products');
     List<dynamic> productTemp = jsonDecode(response.body);
     products.clear();
 
@@ -221,6 +223,7 @@ class _NewSessionFormState extends State<NewSessionForm> {
             RaisedButton.icon(
               padding: EdgeInsets.all(10),
               onPressed: () async {
+                print('Adding session..');
                 Response response = await post('${global.api_url}add-session',
                     headers: <String, String>{
                       'Content-Type': 'application/json; charset=UTF-8',
@@ -232,6 +235,7 @@ class _NewSessionFormState extends State<NewSessionForm> {
                       'products': jsonEncode(form.products)
                     })
                 );
+                print('finished Add action..');
                 print(response.body);
                 Map responseMap = json.decode(response.body);
 
