@@ -6,7 +6,6 @@ import 'package:flutter/rendering.dart';
 import 'package:lifesweettreatsordernotes/models/session.dart';
 import 'package:lifesweettreatsordernotes/components/session_row.dart';
 import 'package:lifesweettreatsordernotes/components/session_ended_row.dart';
-import 'package:lifesweettreatsordernotes/functions/fetchCurrentSession.dart';
 import 'package:lifesweettreatsordernotes/models/order.dart';
 import 'package:lifesweettreatsordernotes/models/sessionType.dart';
 
@@ -24,7 +23,7 @@ class _SessionListState extends State<SessionList> {
   Session sCurrent = Session(name: '', startDate: '', endDate: '', orders: List<Order>());
 
   void getData() async {
-    sCurrent = await new FetchCurrentSession().getData(current_recommended: true);
+    sCurrent = await SessionsData().currentSession(current_recommended: true);
     setState(() {
       sCurrent.orders = sCurrent.orders;
     });

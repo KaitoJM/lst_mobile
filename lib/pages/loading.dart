@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
-import 'package:lifesweettreatsordernotes/functions/fetchCurrentSession.dart';
 
 import 'package:lifesweettreatsordernotes/models/session.dart';
+
+import 'package:lifesweettreatsordernotes/requests/sessions.dart';
 
 class Loading extends StatefulWidget {
   @override
@@ -14,7 +15,7 @@ class _LoadingState extends State<Loading> {
 
   void getData() async {
 
-    session = await new FetchCurrentSession().getData();
+    session = await SessionsData().currentSession();
 
     Navigator.pushReplacementNamed(context, '/home', arguments: {
       'session': session

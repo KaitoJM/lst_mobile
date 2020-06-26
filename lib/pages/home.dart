@@ -1,18 +1,18 @@
 import 'dart:async';
-
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:lifesweettreatsordernotes/requests/sessions.dart';
 import '../components/order_row.dart';
-import 'package:http/http.dart';
 import 'dart:convert';
 
+// models
 import 'package:lifesweettreatsordernotes/models/session.dart';
 import 'package:lifesweettreatsordernotes/models/order.dart';
 
-import 'package:lifesweettreatsordernotes/functions/fetchCurrentSession.dart';
+// requests
+import 'package:lifesweettreatsordernotes/requests/sessions.dart';
+import 'package:lifesweettreatsordernotes/requests/orders.dart';
+
 import 'package:lifesweettreatsordernotes/components/sideMenu.dart';
-import 'package:lifesweettreatsordernotes/globals.dart';
 
 class OrderList extends StatefulWidget {
   @override
@@ -46,18 +46,7 @@ class _OrderListState extends State<OrderList> {
                 Map responseMap = await SessionsData().CloseSessionResponse(session_id: session_id);
 
                 if (responseMap['err'] == 0) {
-                  Session session_refresh = await new FetchCurrentSession().getData();
-
-                  setState(() {
-                    session.id = session_refresh.id;
-                    session.orders = session_refresh.orders;
-                    session.name = session_refresh.name;
-                    session.startDate = session_refresh.startDate;
-                    session.products = session_refresh.products;
-                    session.endDate = session_refresh.endDate;
-                    session.status = session_refresh.status;
-
-                  });
+                  refreshSession();
                 } else {
                   _showErrorMessage('Woah!', responseMap['msg']);
                 }
@@ -94,18 +83,7 @@ class _OrderListState extends State<OrderList> {
                 Map responseMap = await SessionsData().OpenSessionRespose(session_id: session_id);
 
                 if (responseMap['err'] == 0) {
-                  Session session_refresh = await new FetchCurrentSession().getData();
-
-                  setState(() {
-                    session.id = session_refresh.id;
-                    session.orders = session_refresh.orders;
-                    session.name = session_refresh.name;
-                    session.startDate = session_refresh.startDate;
-                    session.products = session_refresh.products;
-                    session.endDate = session_refresh.endDate;
-                    session.status = session_refresh.status;
-
-                  });
+                  refreshSession();
                 } else {
                   _showErrorMessage('Woah!', responseMap['msg']);
                 }
@@ -255,6 +233,20 @@ class _OrderListState extends State<OrderList> {
     }
   }
 
+  void refreshSession() async {
+    Session session_refresh = await SessionsData().currentSession();
+
+    setState(() {
+      session.id = session_refresh.id;
+      session.orders = session_refresh.orders;
+      session.name = session_refresh.name;
+      session.startDate = session_refresh.startDate;
+      session.products = session_refresh.products;
+      session.endDate = session_refresh.endDate;
+      session.status = session_refresh.status;
+    });
+  }
+
   Widget totalAmount(List<Order> orders) {
     double total = 0;
 
@@ -285,18 +277,7 @@ class _OrderListState extends State<OrderList> {
               'order': null
             });
 
-            Session session_refresh = await new FetchCurrentSession().getData();
-
-            setState(() {
-              session.id = session_refresh.id;
-              session.orders = session_refresh.orders;
-              session.name = session_refresh.name;
-              session.startDate = session_refresh.startDate;
-              session.products = session_refresh.products;
-              session.endDate = session_refresh.endDate;
-              session.status = session_refresh.status;
-
-            });
+            refreshSession();
           },
           child: Icon(Icons.add),
           backgroundColor: Colors.pinkAccent[100],
@@ -400,20 +381,7 @@ class _OrderListState extends State<OrderList> {
                 child: Container(
                   child: RefreshIndicator(
                     onRefresh: () async {
-                      Session session_refresh = await new FetchCurrentSession().getData();
-
-                      setState(() {
-                        session.id = session_refresh.id;
-                        session.orders = session_refresh.orders;
-                        session.name = session_refresh.name;
-                        session.startDate = session_refresh.startDate;
-                        session.products = session_refresh.products;
-                        session.endDate = session_refresh.endDate;
-                        session.status = session_refresh.status;
-                      });
-
-                      print('asdsd');
-
+                      refreshSession();
                       return false;
                     },
                     child: ListView(
@@ -430,34 +398,12 @@ class _OrderListState extends State<OrderList> {
                               'order_items': jsonEncode(order.items)
                             });
 
-                            Session session_refresh = await new FetchCurrentSession().getData();
-
-                            setState(() {
-                              session.id = session_refresh.id;
-                              session.orders = session_refresh.orders;
-                              session.name = session_refresh.name;
-                              session.startDate = session_refresh.startDate;
-                              session.products = session_refresh.products;
-                              session.endDate = session_refresh.endDate;
-                              session.status = session_refresh.status;
-                            });
+                            refreshSession();
                           },
                           delete: () async {
 //                          bool del = await deleteConfirmation();
 //                          if (del) {
-                            print('Loading delete Action');
-                              Response response = await post('${global.api_url}delete-order',
-                                headers: <String, String>{
-                                  'Content-Type': 'application/json; charset=UTF-8',
-                                },
-                                  body: jsonEncode(<String, dynamic>{
-                                    'order_id': order.id
-                                  })
-                              );
-                              print('loaded delete action');
-
-                              Map responseMap = json.decode(response.body);
-                              print(responseMap);
+                              Map responseMap = await OrdersData().deleteOrderResponse(order_id: order.id);
 
                               if (responseMap['err'] == 0) {
                                 setState(() {
@@ -466,7 +412,6 @@ class _OrderListState extends State<OrderList> {
                               } else {
                                 _showErrorMessage('Woah!', responseMap['msg']);
                               }
-
 //                          }
                           },
                           openDetails: () {
