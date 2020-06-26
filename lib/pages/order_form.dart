@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
 import 'dart:convert';
 
 import 'package:lifesweettreatsordernotes/models/order.dart';
@@ -9,7 +8,6 @@ import 'package:lifesweettreatsordernotes/models/customer.dart';
 import 'package:lifesweettreatsordernotes/models/user.dart';
 import 'package:lifesweettreatsordernotes/models/gender.dart';
 
-import 'package:lifesweettreatsordernotes/globals.dart';
 import 'package:lifesweettreatsordernotes/requests/orders.dart';
 import 'package:lifesweettreatsordernotes/requests/sessions.dart';
 import 'package:lifesweettreatsordernotes/requests/customers.dart';

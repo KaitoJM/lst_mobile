@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
-import 'package:lifesweettreatsordernotes/models/order.dart';
 import 'dart:convert';
 
 import 'package:lifesweettreatsordernotes/models/sessionProduct.dart';
 import 'package:lifesweettreatsordernotes/models/orderItem.dart';
 
-import 'package:lifesweettreatsordernotes/globals.dart';
+import 'package:lifesweettreatsordernotes/requests/sessions.dart';
+import 'package:lifesweettreatsordernotes/requests/orders.dart';
 
 class EditOrderItems extends StatefulWidget {
   @override
@@ -58,21 +57,7 @@ class _EditOrderItemsState extends State<EditOrderItems> {
   }
 
   void getProductOptions() async {
-    print('Loading products');
-    Response response = await get('${global.api_url}get-sessions-products/${session_id}');
-    print('Loaded products');
-    List<dynamic> options = json.decode(response.body);
-    List<SessionProduct> option_temp = List<SessionProduct>();
-
-    options.forEach((option) {
-      option_temp.add(new SessionProduct(
-          id: option['id'],
-          productId: option['product_id'],
-          productName: option['product_name'],
-          qty: option['quantity'],
-          price: option['price'].toDouble()
-      ));
-    });
+    List<SessionProduct> option_temp = await SessionsData().getSessionProducts(session_id);
 
     setState(() {
       productOption = option_temp;
@@ -327,20 +312,9 @@ class _EditOrderItemsState extends State<EditOrderItems> {
               RaisedButton.icon(
                 onPressed: () async {
                   try {
-                    print('Loading order');
-                    Response response = await post('${global.api_url}update-order',
-                        headers: <String, String>{
-                          'Content-Type': 'application/json; charset=UTF-8',
-                        },
-                        body: jsonEncode(<String, dynamic>{
-                          'order_id': order_id,
-                          'items': jsonEncode(form.items)
-                        })
-                    );
-                    print('Loaded Order');
-
-                    Map responseMap = json.decode(response.body);
+                    Map responseMap = await OrdersData().updateOrder(order_id, jsonEncode(form.items));
                     print(responseMap);
+
                     if (responseMap['err'] == 0) {
                       Navigator.pop(context, true);
                     } else {

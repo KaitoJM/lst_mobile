@@ -28,6 +28,22 @@ class OrdersData {
     return json.decode(response.body);
   }
 
+  Future<Map> updateOrder(int orderId, String formItems) async {
+    print('Updating order...');
+    Response response = await post('${global.api_url}update-order',
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, dynamic>{
+          'order_id': orderId,
+          'items': formItems
+        })
+    );
+    print('Update order finished.');
+
+    return json.decode(response.body);
+  }
+
   Future<Map> deleteOrderResponse({int order_id}) async {
     print('Deleting order...');
     Response response = await post('${global.api_url}delete-order',
