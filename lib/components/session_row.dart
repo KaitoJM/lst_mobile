@@ -40,6 +40,7 @@ class SessionRow extends StatelessWidget {
                   ],
                 )
             ),
+            Text('₱${session.total()}'),
             SizedBox(
                 width: 50,
                 height: 50,

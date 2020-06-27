@@ -12,4 +12,29 @@ class Session {
 
   Session({this.id, this.name, this.startDate, this.endDate, this.status, this.orders, this.products});
 
+  double total_paid() {
+    double total = 0;
+
+    if (orders != null) {
+      orders.forEach((order) {
+        if (order.status == 1) {
+          total += order.total;
+        }
+      });
+    }
+
+    return total;
+  }
+
+  double total() {
+    double total = 0;
+    if (orders != null) {
+      orders.forEach((order) {
+        total += order.total;
+      });
+    }
+
+    return total;
+  }
+
 }

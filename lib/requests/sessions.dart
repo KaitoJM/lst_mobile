@@ -126,6 +126,27 @@ class SessionsData {
         );
       });
 
+      List<dynamic> orderArray = element['orders'];
+      List<Order> orders = List<Order>();
+
+      orderArray.forEach((order) {
+        orders.add(
+          Order(
+            id: order['id'],
+            authorId: order['author_id'],
+            authorFName: order['author_fname'],
+            authorLName: order['author_lname'],
+            customerId: order['customer_id'],
+            customerFName: order['customer_fname'],
+            customerLName: order['customer_lname'],
+            itemCount: order['items_count'],
+            productCount: order['products_count'],
+            total: order['total'],
+            status: order['status']
+          )
+        );
+      });
+
       pending_temp.add(
           Session(
               id: element['id'],
@@ -133,20 +154,43 @@ class SessionsData {
               startDate: element['start_date'],
               endDate: element['end_date'],
               status: element['status'],
-              products: products
+              products: products,
+              orders: orders
           )
       );
     });
 
     List<Session> ended_temp = List<Session>();
     sessionEndedLists.forEach((element) {
+      List<dynamic> orderArray = element['orders'];
+      List<Order> orders = List<Order>();
+
+      orderArray.forEach((order) {
+        orders.add(
+            Order(
+                id: order['id'],
+                authorId: order['author_id'],
+                authorFName: order['author_fname'],
+                authorLName: order['author_lname'],
+                customerId: order['customer_id'],
+                customerFName: order['customer_fname'],
+                customerLName: order['customer_lname'],
+                itemCount: order['items_count'],
+                productCount: order['products_count'],
+                total: order['total'],
+                status: order['status']
+            )
+        );
+      });
+
       ended_temp.add(
           Session(
               id: element['id'],
               name: element['name'],
               startDate: element['start_date'],
               endDate: element['end_date'],
-              status: element['status']
+              status: element['status'],
+              orders: orders
           )
       );
     });

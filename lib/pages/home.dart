@@ -258,22 +258,6 @@ class _OrderListState extends State<OrderList> {
     });
   }
 
-  Widget totalAmount(List<Order> orders) {
-    double total = 0;
-
-    orders.forEach((element) {
-      total += element.total;
-    });
-
-    return Text(
-      '₱${total.toString()}',
-      style: TextStyle(
-          fontWeight: FontWeight.bold,
-          fontSize: 20
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
 
@@ -483,11 +467,31 @@ class _OrderListState extends State<OrderList> {
               ),
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.center,
+                crossAxisAlignment: CrossAxisAlignment.end,
                 children: <Widget>[
                   Text('TOTAL :'),
                   SizedBox(width: 10),
-                  totalAmount(session.orders)
+                  if (session.status == 1)
+                  Text(
+                    '₱${session.total_paid().toString()} ',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 25,
+                      color: Colors.pinkAccent[100]
+                    ),
+                  ),
+                  if (session.status == 1)
+                    Text('/',style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15
+                    ),),
+                  Text(
+                    '₱${session.total().toString()}',
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: (session.status == 1) ? 15 : 20
+                    ),
+                  ),
                 ],
               )
             ],

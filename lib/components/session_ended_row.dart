@@ -35,6 +35,7 @@ class SessionEndedRow extends StatelessWidget {
                   ],
                 )
             ),
+            Text('₱${session.total_paid()} / ₱${session.total()}'),
             IconButton(
               onPressed: (){},
               icon: Icon(Icons.chevron_right),
