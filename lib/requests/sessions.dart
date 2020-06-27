@@ -19,72 +19,77 @@ class SessionsData {
     }
 
     Response response = await get(url);
+    if (response.statusCode == 200) {
+      print('Loaded Current Session');
 
-    print('Loaded Current Session');
+      if (json.decode(response.body).length > 0) {
+        Map session_map = json.decode(response.body);
 
-    if (json.decode(response.body).length > 0) {
-      Map session_map = json.decode(response.body);
+        List<dynamic> orderArray = session_map['orders'];
+        List<Order> orders = List<Order>();
 
-      List<dynamic> orderArray = session_map['orders'];
-      List<Order> orders = List<Order>();
+        orderArray.forEach((order) {
+          List<dynamic> itemsArrray = order['items'];
+          List<OrderItem> items = List<OrderItem>();
 
-      orderArray.forEach((order) {
-        List<dynamic> itemsArrray = order['items'];
-        List<OrderItem> items = List<OrderItem>();
+          itemsArrray.forEach((item) {
+            items.add(
+                new OrderItem(
+                    id: item['id'],
+                    image: item['image'],
+                    price: item['price'].toDouble(), //parse to double
+                    productId: item['product_id'],
+                    sessionProductId: item['session_product_id'],
+                    productName: item['product'],
+                    qty: item['qty'],
+                    total: item['total'].toDouble()
+                )
+            );
+          });
 
-        itemsArrray.forEach((item) {
-          items.add(
-              new OrderItem(
-                  id: item['id'],
-                  image: item['image'],
-                  price: item['price'].toDouble(), //parse to double
-                  productId: item['product_id'],
-                  sessionProductId: item['session_product_id'],
-                  productName: item['product'],
-                  qty: item['qty'],
-                  total: item['total'].toDouble()
-              )
-          );
+          orders.add(new Order(
+              id: order['id'],
+              authorId: order['author_id'],
+              authorFName: order['author_fname'],
+              authorLName: order['author_lname'],
+              customerId: order['customer_id'],
+              customerFName: order['customer_fname'],
+              customerLName: order['customer_lname'],
+              itemCount: order['items_count'],
+              productCount: order['products_count'],
+              total: order['total'],
+              items: items
+          ));
         });
 
-        orders.add(new Order(
-            id: order['id'],
-            authorId: order['author_id'],
-            authorFName: order['author_fname'],
-            authorLName: order['author_lname'],
-            customerId: order['customer_id'],
-            customerFName: order['customer_fname'],
-            customerLName: order['customer_lname'],
-            itemCount: order['items_count'],
-            productCount: order['products_count'],
-            total: order['total'],
-            items: items
-        ));
-      });
+        List<dynamic> productArray = session_map['products'];
+        List<SessionProduct> products = List<SessionProduct>();
 
-      List<dynamic> productArray = session_map['products'];
-      List<SessionProduct> products = List<SessionProduct>();
+        productArray.forEach((product) {
+          products.add(new SessionProduct(
+            id: product['id'],
+            productName: product['product'],
+            productId: product['product_id'],
+            price: product['price'].toDouble(),
+            qty: product['qty'],
+            totalOrderQty: product['total_order_qty'],
+            totalOrderQtyOrdered: product['total_order_qty_ordered'],
+            totalOrderQtyPaid: product['total_order_qty_paid'],
+            totalOrderAmount: product['total_order_amount'].toDouble(),
+            totalOrderOrdered: product['total_order_ordered'].toDouble(),
+            totalOrderPaid: product['total_order_paid'].toDouble(),
+          ));
+        });
 
-      productArray.forEach((product) {
-        products.add(new SessionProduct(
-          id: product['id'],
-          productName: product['product'],
-          productId: product['product_id'],
-          price: product['price'].toDouble(),
-          qty: product['qty'],
-          totalOrderQty: product['total_order_qty'],
-          totalOrderQtyOrdered: product['total_order_qty_ordered'],
-          totalOrderQtyPaid: product['total_order_qty_paid'],
-          totalOrderAmount: product['total_order_amount'].toDouble(),
-          totalOrderOrdered: product['total_order_ordered'].toDouble(),
-          totalOrderPaid: product['total_order_paid'].toDouble(),
-        ));
-      });
-
-      return Session(id: session_map['id'], name: session_map['name'], startDate: session_map['start_date'], endDate: session_map['end_date'], status: session_map['status'], orders: orders, products: products);
+        return Session(id: session_map['id'], name: session_map['name'], startDate: session_map['start_date'], endDate: session_map['end_date'], status: session_map['status'], orders: orders, products: products);
+      } else {
+        return Session(name: '', startDate: '', orders: List<Order>(), products: List<SessionProduct>());
+      }
     } else {
+      print('${response.statusCode}: A network error occurred');
       return Session(name: '', startDate: '', orders: List<Order>(), products: List<SessionProduct>());
     }
+
   }
 
   Future<SessionType> allSessions() async {
