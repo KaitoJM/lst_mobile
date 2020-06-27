@@ -5,78 +5,54 @@ enum rowOption { showItems, edit, remove }
 
 class OrderRow extends StatelessWidget {
   final Order order;
-  final Function edit;
-  final Function delete;
-  final Function openDetails;
 
-  OrderRow({this.order, this.edit, this.delete, this.openDetails});
+  OrderRow({this.order});
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: <Widget>[
-        Row(
-          children: <Widget>[
-            Padding(
-              padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
-              child: Text(
-                order.productCount.toString(),
-                style: TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 20
+    return Container(
+      decoration: BoxDecoration(
+        border: Border(bottom: BorderSide(width: 1, color: Colors.grey)),
+        color: Colors.white,
+      ),
+      padding: EdgeInsets.symmetric(vertical: 8, horizontal: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Row(
+            children: <Widget>[
+              Padding(
+                padding: const EdgeInsets.symmetric(vertical: 0, horizontal: 5),
+                child: Icon(
+                  (order.status == 1) ? Icons.check_box : Icons.check_box_outline_blank,
+                  color: Colors.green[200],
                 ),
               ),
-            ),
-            Expanded(
-              child: Text('${order.customerFName} ${order.customerLName}'),
-            ),
-            Text('₱${order.total.toString()}'),
-            SizedBox(
-              width: 30,
-              height: 30,
-              child: PopupMenuButton<rowOption>(
-                onSelected: (rowOption result) {
-                  if (result == rowOption.showItems) {
-                    openDetails();
-                  }
-                  if (result == rowOption.edit) {
-                    edit();
-                  }
-                  if (result == rowOption.remove) {
-                    delete();
-                  }
-                },
-                itemBuilder: (BuildContext context) => <PopupMenuEntry<rowOption>>[
-                  const PopupMenuItem<rowOption>(
-                    value: rowOption.showItems,
-                    child: Text('Show order items'),
+              Padding(
+                padding: EdgeInsets.fromLTRB(0, 0, 10, 0),
+                child: Text(
+                  order.productCount.toString(),
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 20
                   ),
-                  const PopupMenuItem<rowOption>(
-                    value: rowOption.edit,
-                    child: Text('Edit order'),
-                  ),
-                  const PopupMenuItem<rowOption>(
-                    value: rowOption.remove,
-                    child: Text('Cancel order'),
-                  ),
-                ],
-              )
-            ),
-          ],
-        ),
-        Text(
-          '- ${order.authorFName} ${order.authorLName}',
-          style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.bold
+                ),
+              ),
+              Expanded(
+                child: Text('${order.customerFName} ${order.customerLName}'),
+              ),
+              Text('₱${order.total.toString()}'),
+            ],
           ),
-        ),
-        Divider(
-          height: 15,
-          color: Colors.grey,
-        )
-      ],
+          Text(
+            '- ${order.authorFName} ${order.authorLName}',
+            style: TextStyle(
+                fontSize: 10,
+                fontWeight: FontWeight.bold
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

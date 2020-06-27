@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'dart:convert';
+import 'package:flutter_slidable/flutter_slidable.dart';
 
 // models
 import 'package:lifesweettreatsordernotes/models/session.dart';
@@ -77,9 +78,18 @@ class _OrderListState extends State<OrderList> {
                 Navigator.of(context).pop();
               },
             ),
+            new FlatButton(
+              child: new Text("Edit Session"),
+              onPressed: () async {
+                Navigator.of(context).pop();
+                Navigator.pushNamed(context, '/new_session', arguments: {
+                  'session': session
+                });
+              },
+            ),
             // usually buttons at the bottom of the dialog
             new FlatButton(
-              child: new Text("Yes Continue!"),
+              child: new Text("Continue"),
               onPressed: () async {
                 Map responseMap = await SessionsData().OpenSessionRespose(session_id: session_id);
 
@@ -271,7 +281,8 @@ class _OrderListState extends State<OrderList> {
     session = data['session'];
 
     return Scaffold(
-        floatingActionButton: FloatingActionButton(
+        backgroundColor: Colors.white,
+        floatingActionButton: (session.id != null) ? FloatingActionButton(
           onPressed: () async {
             dynamic received = await Navigator.pushNamed(context, '/new_order', arguments: {
               'session_id': session.id,
@@ -282,16 +293,16 @@ class _OrderListState extends State<OrderList> {
           },
           child: Icon(Icons.add),
           backgroundColor: Colors.pinkAccent[100],
-        ),
+        ) : null,
         appBar: AppBar(
-          title: Text((session.status == 1) ? 'Today\'s Orders' : (session.status == 0) ? 'Pending Session' : 'No Current Session'),
+          title: Text((session.status == 1) ? 'Today\'s Orders' : (session.status == 0) ? 'Pending Session' : 'No Session'),
           centerTitle: true,
           backgroundColor: Colors.pinkAccent[100],
           elevation: 0.0,
         ),
         drawer: SideMenu(),
-        body: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+        body: (session.id != null) ? Padding(
+          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
@@ -374,10 +385,6 @@ class _OrderListState extends State<OrderList> {
                   }).toList(),
                 ),
               ),
-              Divider(
-                height: 20,
-                color: Colors.grey,
-              ),
               Expanded(
                 child: Container(
                   child: RefreshIndicator(
@@ -388,36 +395,86 @@ class _OrderListState extends State<OrderList> {
                     child: ListView(
                       physics: const AlwaysScrollableScrollPhysics(),
                       children: session.orders.map((order) {
-                        return OrderRow(
-                          order: order,
-                          edit: () async {
-
-                            dynamic received = await Navigator.pushNamed(context, '/edit_order', arguments: {
-                              'session_id': session.id,
-                              'order_id': order.id,
-                              'customer_name': '${order.customerFName} ${order.customerLName}',
-                              'order_items': jsonEncode(order.items)
-                            });
-
-                            refreshSession();
-                          },
-                          delete: () async {
-//                          bool del = await deleteConfirmation();
-//                          if (del) {
-                              Map responseMap = await OrdersData().deleteOrderResponse(order_id: order.id);
-
-                              if (responseMap['err'] == 0) {
-                                setState(() {
-                                  session.orders.remove(order);
+                        return Slidable(
+                          key: new Key(order.id.toString()),
+                          actionPane: SlidableDrawerActionPane(),
+                          actionExtentRatio: 0.25,
+                          actions: <Widget>[
+                            new IconSlideAction(
+                              caption: 'Items',
+                              color: Colors.blue,
+                              icon: Icons.list,
+                              onTap: () {
+                                OpenDialog(order);
+                              },
+                            ),
+                            if (session.status == 1)
+                            IconSlideAction(
+                              caption: (order.status == 0) ? 'Paid' : 'Unpaid',
+                              color: Colors.indigo,
+                              icon: (order.status == 0) ? Icons.check : Icons.close,
+                              onTap: () async {
+                                if (order.status == 0) {
+                                  Map response = await OrdersData().payOrderResponse(order.id);
+                                  if (response['err'] == 0) {
+                                    setState(() {
+                                      session.orders[session.orders.indexOf(order)].status = 1;
+                                    });
+                                  } else {
+                                    _showErrorMessage('Woah!', response['msg']);
+                                  }
+                                } else if(order.status == 1) {
+                                  Map response = await OrdersData().unpayOrderResponse(order.id);
+                                  if (response['err'] == 0) {
+                                    setState(() {
+                                      session.orders[session.orders.indexOf(order)].status = 0;
+                                    });
+                                  } else {
+                                    _showErrorMessage('Woah!', response['msg']);
+                                  }
+                                }
+                              },
+                            ),
+                          ],
+                          secondaryActions: <Widget>[
+                            new IconSlideAction(
+                              caption: 'Edit',
+                              color: Colors.black45,
+                              icon: Icons.edit,
+                              onTap: () async {
+                                dynamic received = await Navigator.pushNamed(context, '/edit_order', arguments: {
+                                'session_id': session.id,
+                                'order_id': order.id,
+                                'customer_name': '${order.customerFName} ${order.customerLName}',
+                                'order_items': jsonEncode(order.items)
                                 });
-                              } else {
-                                _showErrorMessage('Woah!', responseMap['msg']);
-                              }
-//                          }
-                          },
-                          openDetails: () {
-                            OpenDialog(order);
-                          }
+
+                              refreshSession();
+                              },
+                            ),
+                            new IconSlideAction(
+                              caption: 'Delete',
+                              color: Colors.red,
+                              icon: Icons.delete,
+                              onTap: () async {
+//                                bool del = await deleteConfirmation();
+    //                          if (del) {
+                                  Map responseMap = await OrdersData().deleteOrderResponse(order_id: order.id);
+
+                                  if (responseMap['err'] == 0) {
+                                  setState(() {
+                                  session.orders.remove(order);
+                                  });
+                                  } else {
+                                  _showErrorMessage('Woah!', responseMap['msg']);
+                                  }
+    //                          }
+                              },
+                            ),
+                          ],
+                          child: OrderRow(
+                            order: order,
+                          ),
                         );
                       }).toList(),
                     ),
@@ -436,6 +493,35 @@ class _OrderListState extends State<OrderList> {
             ],
           ),
         )
+        : Padding(
+          padding: EdgeInsets.all(10),
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: <Widget>[
+                Icon(Icons.error_outline, size: 150, color: Colors.pink[100]),
+                Text('There are no session to be displayed\nat the moment.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 18
+                  ),
+                ),
+                RaisedButton(
+                  onPressed: () async {
+                    await Navigator.pushNamed(context, '/new_session');
+                    refreshSession();
+                  },
+                  child: Text('Add new session',
+                    style: TextStyle(
+                      color: Colors.white
+                    ),
+                  ),
+                  color: Colors.pinkAccent[100],
+                )
+              ],
+            ),
+          ),
+        ),
     );
   }
 }

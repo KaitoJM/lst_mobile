@@ -13,7 +13,8 @@ class Order {
   int itemCount;
   int productCount;
   int total;
+  int status;
   List<OrderItem> items;
 
-  Order({this.id, this.sessionId, this.customerId, this.customerFName, this.customerLName, this.authorId, this.authorFName, this.authorLName, this.deliveredBy, this.itemCount, this.productCount, this.total, this.items});
+  Order({this.id, this.sessionId, this.customerId, this.customerFName, this.customerLName, this.authorId, this.authorFName, this.authorLName, this.deliveredBy, this.itemCount, this.productCount, this.total, this.status, this.items});
 }

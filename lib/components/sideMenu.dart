@@ -9,6 +9,7 @@ class SideMenu extends StatelessWidget {
         children: <Widget>[
           Container(
             width: 310,
+            height: 228,
             padding: EdgeInsets.fromLTRB(0, 50, 0, 25),
             color: Colors.pinkAccent[100],
             child: Column(

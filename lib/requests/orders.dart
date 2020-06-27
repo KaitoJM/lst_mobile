@@ -58,4 +58,34 @@ class OrdersData {
 
     return  json.decode(response.body);
   }
+
+  Future<Map> payOrderResponse(int order_id) async {
+    print('Setting up payment...');
+    Response response = await post('${global.api_url}pay-order',
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, dynamic>{
+          'order_id': order_id
+        })
+    );
+    print('Paid order function finished.');
+
+    return  json.decode(response.body);
+  }
+
+  Future<Map> unpayOrderResponse(int order_id) async {
+    print('Rollback payment...');
+    Response response = await post('${global.api_url}pay-order',
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, dynamic>{
+          'order_id': order_id
+        })
+    );
+    print('Payment rollback function finished.');
+
+    return  json.decode(response.body);
+  }
 }

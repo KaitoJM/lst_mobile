@@ -146,7 +146,7 @@ class _SessionListState extends State<SessionList> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
               SizedBox(height: 10),
-              Card(
+              (sCurrent.id != null) ? Card(
                 color: Colors.amber,
                 child: Padding(
                   padding: const EdgeInsets.all(15),
@@ -157,7 +157,7 @@ class _SessionListState extends State<SessionList> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: <Widget>[
                             Text(
-                              ((sCurrent.name == '') || (sCurrent.name == null)) ? 'No Open Sessions \nat the Moment' : sCurrent.name,
+                              sCurrent.name,
                               style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold
@@ -212,6 +212,23 @@ class _SessionListState extends State<SessionList> {
                       ),
                     ],
                   ),
+                ),
+              ) : Padding(
+                padding: const EdgeInsets.fromLTRB(15, 0, 15, 15),
+                child: Container (
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    color: Colors.red[100],
+                    boxShadow: [
+                      BoxShadow(color: Colors.red, spreadRadius: 1),
+                    ],
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(15),
+                    child: Center(
+                      child: Text("No current session at the moment."),
+                    ),
+                  )
                 ),
               ),
               SizedBox(height: 10),

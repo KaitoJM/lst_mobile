@@ -58,6 +58,7 @@ class SessionsData {
               itemCount: order['items_count'],
               productCount: order['products_count'],
               total: order['total'],
+              status: order['status'],
               items: items
           ));
         });
