@@ -8,6 +8,7 @@ import 'pages/edit_order_items.dart';
 
 void main() {
   runApp(MaterialApp(
+    debugShowCheckedModeBanner: false,
     initialRoute: '/loading',
     routes: {
       '/home': (context) => OrderList(),

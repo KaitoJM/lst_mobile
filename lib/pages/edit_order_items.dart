@@ -143,6 +143,7 @@ class _EditOrderItemsState extends State<EditOrderItems> {
                   Expanded(
                     flex: 5,
                     child: DropdownButtonFormField<int>(
+                      isExpanded: true,
                       items: productOption.map((SessionProduct value) {
                         return new DropdownMenuItem<int>(
                           value: productOption.indexOf(value),

@@ -299,17 +299,9 @@ class _OrderFormState extends State<OrderForm> {
               SizedBox(height: 10),
               Row(
                 children: <Widget>[
-                  IconButton(
-                    padding: EdgeInsets.all(20),
-                    onPressed: () {
-                      _showCustomerForm();
-                    },
-                    icon: Icon(Icons.person_add,
-                      color: Colors.black54,
-                    ),
-                  ),
                   Expanded(
                     child: DropdownButtonFormField<int>(
+                      isExpanded: true,
                       value: selected_customer,
                       items: customers.map((Customer value) {
                         return new DropdownMenuItem<int>(
@@ -318,6 +310,15 @@ class _OrderFormState extends State<OrderForm> {
                         );
                       }).toList(),
                       decoration: InputDecoration(
+                        prefixIcon: IconButton(
+                          padding: EdgeInsets.all(20),
+                          onPressed: () {
+                            _showCustomerForm();
+                          },
+                          icon: Icon(Icons.person_add,
+                            color: Colors.black54,
+                          ),
+                        ),
                         border: OutlineInputBorder(),
                         labelText: 'Customer',
                       ),
@@ -358,6 +359,7 @@ class _OrderFormState extends State<OrderForm> {
                   Expanded(
                     flex: 5,
                     child: DropdownButtonFormField<int>(
+                      isExpanded: true,
                       items: productOption.map((SessionProduct value) {
                         return new DropdownMenuItem<int>(
                           value: productOption.indexOf(value),

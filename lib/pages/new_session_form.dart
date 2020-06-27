@@ -89,6 +89,7 @@ class _NewSessionFormState extends State<NewSessionForm> {
         elevation: 0.0,
       ),
       body: Container(
+
         padding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
         child: ListView(
           children: <Widget>[
@@ -143,6 +144,7 @@ class _NewSessionFormState extends State<NewSessionForm> {
               children: <Widget>[
                 Expanded(
                   child: DropdownButtonFormField<Product>(
+                    isExpanded: true,
                     value: selectedProduct,
                     items: products.map((Product value) {
                       return new DropdownMenuItem<Product>(
