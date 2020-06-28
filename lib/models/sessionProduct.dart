@@ -1,3 +1,5 @@
+import 'package:lifesweettreatsordernotes/models/orderItem.dart';
+
 class SessionProduct {
   int id;
   String productName;
@@ -10,8 +12,35 @@ class SessionProduct {
   double totalOrderAmount;
   double totalOrderOrdered;
   double totalOrderPaid;
+  List<OrderItem> orderItems;
 
-  SessionProduct({this.id, this.productName, this.productId, this.price, this.qty, this.totalOrderQty, this.totalOrderQtyOrdered, this.totalOrderQtyPaid, this.totalOrderAmount, this.totalOrderOrdered, this.totalOrderPaid});
+  SessionProduct({this.id, this.productName, this.productId, this.price, this.qty, this.totalOrderQty, this.totalOrderQtyOrdered, this.totalOrderQtyPaid, this.totalOrderAmount, this.totalOrderOrdered, this.totalOrderPaid, this.orderItems});
+
+  double total() {
+    double total = 0;
+
+    if (orderItems != null) {
+      orderItems.forEach((element) {
+        total += element.totalComuted();
+      });
+    }
+
+    return total;
+  }
+
+  double totalPaid() {
+    double total = 0;
+
+    if (orderItems != null) {
+      orderItems.forEach((element) {
+        if (element.order.status == 1) {
+          total += element.totalComuted();
+        }
+      });
+    }
+
+    return total;
+  }
 
   Map<String, dynamic> toJson(){
     return {

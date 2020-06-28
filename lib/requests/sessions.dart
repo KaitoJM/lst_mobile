@@ -261,4 +261,76 @@ class SessionsData {
 
     return option_temp;
   }
+
+  Future<Session> getSessionByProduct(int session_id) async {
+    print('Loading session details...');
+    Response response = await post('${global.api_url}get-session-by-product',
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, dynamic>{
+          'session_id': session_id
+        })
+    );
+    print('Fetching session details done.');
+
+    Map session_map = json.decode(response.body);
+
+    print(session_map);
+
+    if (session_map['session'] != null) {
+      List products = session_map['session']['products'];
+      List<SessionProduct> sessionProducts = List<SessionProduct>();
+
+      products.forEach((prod) {
+        List<OrderItem> orderItems = List<OrderItem>();
+        List items = prod['order_items'];
+
+        items.forEach((item) {
+          Order order = Order(
+            id: item['order']['id'],
+            sessionId: item['order']['session_id'],
+            customerId: item['order']['customer_id'],
+            customerLName: item['order']['customer']['lname'],
+            customerFName: item['order']['customer']['fname'],
+            status: item['order']['status']
+          );
+
+          orderItems.add(
+            OrderItem(
+              id: item['id'],
+              price: item['price'].toDouble(),
+              sessionProductId: prod['id'],
+              productId: item['product_id'],
+              productName: prod['product']['name'],
+              qty: item['qty'],
+              order: order
+//              total: item['qty'] * prod['id'].toDouble()
+            )
+          );
+        });
+
+        sessionProducts.add(
+          SessionProduct(
+            id: prod['id'],
+            productName: prod['product']['name'],
+            productId: prod['product_id'],
+            price: prod['product']['price'].toDouble(),
+            qty: prod['quantity'],
+            orderItems: orderItems
+          )
+        );
+      });
+
+      return Session(
+        id: session_map['session']['id'],
+        name: session_map['session']['name'],
+        startDate: session_map['session']['start_date'],
+        endDate: session_map['session']['end_date'],
+        products: sessionProducts
+      );
+    } else {
+      return Session(name: '', startDate: '', orders: List<Order>(), products: List<SessionProduct>());
+    }
+  }
 }

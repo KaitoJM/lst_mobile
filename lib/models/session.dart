@@ -21,6 +21,12 @@ class Session {
           total += order.total;
         }
       });
+    } else {
+      if (products != null) {
+        products.forEach((product) {
+          total += product.totalPaid();
+        });
+      }
     }
 
     return total;
@@ -32,6 +38,12 @@ class Session {
       orders.forEach((order) {
         total += order.total;
       });
+    } else {
+      if (products != null) {
+        products.forEach((product) {
+          total += product.total();
+        });
+      }
     }
 
     return total;

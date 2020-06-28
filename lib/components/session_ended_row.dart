@@ -4,8 +4,9 @@ import 'package:lifesweettreatsordernotes/models/session.dart';
 
 class SessionEndedRow extends StatelessWidget {
   final Session session;
+  final Function viewDetails;
 
-  SessionEndedRow({this.session});
+  SessionEndedRow({this.session, this.viewDetails});
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +38,7 @@ class SessionEndedRow extends StatelessWidget {
             ),
             Text('₱${session.total_paid()} / ₱${session.total()}'),
             IconButton(
-              onPressed: (){},
+              onPressed: viewDetails,
               icon: Icon(Icons.chevron_right),
             )
           ],

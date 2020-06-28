@@ -326,7 +326,14 @@ class _SessionListState extends State<SessionList> {
               Expanded(
                 child: ListView(
                   children: sEnded.map((session) {
-                    return SessionEndedRow(session: session);
+                    return SessionEndedRow(
+                      session: session,
+                      viewDetails: () {
+                        Navigator.pushNamed(context, '/history_details', arguments: {
+                          'session_id': session.id
+                        });
+                      },
+                    );
                   }).toList(),
                 ),
               ),

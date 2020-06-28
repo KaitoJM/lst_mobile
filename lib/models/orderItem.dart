@@ -1,3 +1,5 @@
+import 'package:lifesweettreatsordernotes/models/order.dart';
+
 class OrderItem {
   int id;
   String image;
@@ -7,8 +9,13 @@ class OrderItem {
   String productName;
   int qty;
   double total;
+  Order order;
 
-  OrderItem({this.id, this.image, this.price, this.productId, this.productName, this.sessionProductId, this.qty, this.total});
+  OrderItem({this.id, this.image, this.price, this.productId, this.productName, this.sessionProductId, this.qty, this.total, this.order});
+
+  double totalComuted() {
+    return qty * price;
+  }
 
   Map<String, dynamic> toJson(){
     return {

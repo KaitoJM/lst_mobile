@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lifesweettreatsordernotes/pages/new_session_form.dart';
 import 'package:lifesweettreatsordernotes/pages/sessions.dart';
+import 'pages/history_details.dart';
 import 'pages/home.dart';
 import 'pages/order_form.dart';
 import 'pages/loading.dart';
@@ -17,6 +18,7 @@ void main() {
       '/sessions': (context) => SessionList(),
       '/new_session': (context) => NewSessionForm(),
       '/new_order': (context) => OrderForm(),
+      '/history_details': (context) => HistoryDetails(),
     },
   ));
 }
