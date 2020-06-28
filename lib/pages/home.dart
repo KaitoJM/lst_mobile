@@ -24,6 +24,7 @@ class OrderList extends StatefulWidget {
 class _OrderListState extends State<OrderList> {
   Map data = {};
   Session session;
+  bool loading = false;
 
   void _showDialogCloseSession(int session_id) {
     // flutter defined function
@@ -45,7 +46,15 @@ class _OrderListState extends State<OrderList> {
             new FlatButton(
               child: new Text("Yes Continue!"),
               onPressed: () async {
+                setState(() {
+                  loading = true;
+                });
                 Map responseMap = await SessionsData().CloseSessionResponse(session_id: session_id);
+
+                setState(() {
+                  loading = false;
+                });
+
 
                 if (responseMap['err'] == 0) {
                   refreshSession();
@@ -91,7 +100,14 @@ class _OrderListState extends State<OrderList> {
             new FlatButton(
               child: new Text("Continue"),
               onPressed: () async {
+                setState(() {
+                  loading = true;
+                });
                 Map responseMap = await SessionsData().OpenSessionRespose(session_id: session_id);
+
+                setState(() {
+                  loading = false;
+                });
 
                 if (responseMap['err'] == 0) {
                   refreshSession();
@@ -245,9 +261,13 @@ class _OrderListState extends State<OrderList> {
   }
 
   void refreshSession() async {
+    setState(() {
+      loading = true;
+    });
     Session session_refresh = await SessionsData().currentSession();
 
     setState(() {
+      loading = false;
       session.id = session_refresh.id;
       session.orders = session_refresh.orders;
       session.name = session_refresh.name;
@@ -285,244 +305,256 @@ class _OrderListState extends State<OrderList> {
           elevation: 0.0,
         ),
         drawer: SideMenu(),
-        body: (session.id != null) ? Padding(
-          padding: EdgeInsets.symmetric(horizontal: 15, vertical: 15),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Padding(
-                padding: EdgeInsets.fromLTRB(0, 0, 0, 5),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        body: (session.id != null) ? Column(
+          children: <Widget>[
+            if(loading)
+            LinearProgressIndicator(
+              backgroundColor: Colors.pinkAccent,
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.pink),
+            ),
+            Expanded(
+              child: Container(
+                padding: EdgeInsets.all(15),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: <Widget>[
-                    Text(
-                      (session.name != null) ? session.name : '',
-                      style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.black54
-                      ),
-                    ),
-                    OutlineButton.icon(
-                        onPressed: () {
-                          if (session.status == 1) {
-                            // to close
-                            _showDialogCloseSession(session.id);
-                          } else if (session.status == 0) {
-                            //to open
-                            _showDialogOpenSession(session.id);
-                          } else {
-                            _showErrorMessage('Oops!', 'Invalid session.');
-                          }
-                        },
-                        icon: ((session.status == 1) ? Icon(Icons.cancel) : (session.status == 0) ? Icon(Icons.open_in_browser) : Icon(Icons.cancel)),
-                        label: Text((session.status == 1) ? 'Close' : (session.status == 0) ? 'Open' : ' --- '),
-                    )
-                  ],
-                )
-              ),
-              Container(
-                height: 110,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: session.products.map((product) {
-                    return Expanded(
-                      flex: 1,
-                      child: Container(
-                        margin: EdgeInsets.all(3),
-                        height: 80,
-                        padding: EdgeInsets.symmetric(vertical: 7, horizontal: 10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                    Container(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
-                            Text((session.status == 1) ? '${product.totalOrderQtyOrdered}/${product.qty}' : (session.status == 0) ? '${product.totalOrderQtyOrdered}' : '',
+                            Text(
+                              (session.name != null) ? session.name : '',
                               style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: (session.status == 1) ? 15 : (session.status == 0) ? 30 : 30,
-                                color: Colors.white
+                                  fontSize: 20,
+                                  color: Colors.black54
                               ),
                             ),
-                            Text((session.status == 1) ? '₱${product.totalOrderAmount}' : (session.status == 0) ? '' : '',
-                              style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: (session.status == 1) ? 15 : 0,
-                                  color: Colors.white
-                              ),
-                            ),
-                            SizedBox(height: 5),
-                            Text('${product.productName}',
-                              style: TextStyle(
-                                fontSize: 10,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ],
-                        ),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(5),
-                          color: Colors.amber[300],
-                          boxShadow: [
-                            BoxShadow(color: Colors.amber, spreadRadius: 1),
-                          ],
-                        ),
-                      )
-                    );
-                  }).toList(),
-                ),
-              ),
-              Expanded(
-                child: Container(
-                  child: RefreshIndicator(
-                    onRefresh: () async {
-                      refreshSession();
-                      return false;
-                    },
-                    child: ListView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      children: session.orders.map((order) {
-                        return Slidable(
-                          key: new Key(order.id.toString()),
-                          actionPane: SlidableDrawerActionPane(),
-                          actionExtentRatio: 0.25,
-                          actions: <Widget>[
-                            new IconSlideAction(
-                              caption: 'Items',
-                              color: Colors.blue,
-                              icon: Icons.list,
-                              onTap: () {
-                                OpenDialog(order);
-                              },
-                            ),
-                            if (session.status == 1)
-                            IconSlideAction(
-                              caption: (order.status == 0) ? 'Paid' : 'Unpaid',
-                              color: Colors.indigo,
-                              icon: (order.status == 0) ? Icons.check : Icons.close,
-                              onTap: () async {
-                                if (order.status == 0) {
-                                  Map response = await OrdersData().payOrderResponse(order.id);
-                                  if (response['err'] == 0) {
-                                    setState(() {
-                                      session.orders[session.orders.indexOf(order)].status = 1;
-                                    });
-                                  } else {
-                                    _showErrorMessage('Woah!', response['msg']);
-                                  }
-                                } else if(order.status == 1) {
-                                  Map response = await OrdersData().unpayOrderResponse(order.id);
-                                  if (response['err'] == 0) {
-                                    setState(() {
-                                      session.orders[session.orders.indexOf(order)].status = 0;
-                                    });
-                                  } else {
-                                    _showErrorMessage('Woah!', response['msg']);
-                                  }
+                            OutlineButton.icon(
+                              onPressed: () {
+                                if (session.status == 1) {
+                                  // to close
+                                  _showDialogCloseSession(session.id);
+                                } else if (session.status == 0) {
+                                  //to open
+                                  _showDialogOpenSession(session.id);
+                                } else {
+                                  _showErrorMessage('Oops!', 'Invalid session.');
                                 }
                               },
-                            ),
+                              icon: ((session.status == 1) ? Icon(Icons.cancel) : (session.status == 0) ? Icon(Icons.open_in_browser) : Icon(Icons.cancel)),
+                              label: Text((session.status == 1) ? 'Close' : (session.status == 0) ? 'Open' : ' --- '),
+                            )
                           ],
-                          secondaryActions: <Widget>[
-                            new IconSlideAction(
-                              caption: 'Edit',
-                              color: Colors.black45,
-                              icon: Icons.edit,
-                              onTap: () async {
-                                dynamic received = await Navigator.pushNamed(context, '/edit_order', arguments: {
-                                'session_id': session.id,
-                                'order_id': order.id,
-                                'customer_name': '${order.customerFName} ${order.customerLName}',
-                                'order_items': jsonEncode(order.items)
-                                });
-
-                              refreshSession();
-                              },
-                            ),
-                            new IconSlideAction(
-                              caption: 'Delete',
-                              color: Colors.red,
-                              icon: Icons.delete,
-                              onTap: () async {
-//                                bool del = await deleteConfirmation();
-    //                          if (del) {
-                                  Map responseMap = await OrdersData().deleteOrderResponse(order_id: order.id);
-
-                                  if (responseMap['err'] == 0) {
-                                  setState(() {
-                                  session.orders.remove(order);
-                                  });
-                                  } else {
-                                  _showErrorMessage('Woah!', responseMap['msg']);
-                                  }
-    //                          }
-                              },
-                            ),
-                          ],
-                          child: OrderRow(
-                            order: order,
-                          ),
-                        );
-                      }).toList(),
+                        )
                     ),
-                  ),
+                    Container(
+                      height: 110,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: session.products.map((product) {
+                          return Expanded(
+                              flex: 1,
+                              child: Container(
+                                margin: EdgeInsets.all(3),
+                                height: 80,
+                                padding: EdgeInsets.symmetric(vertical: 7, horizontal: 10),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: <Widget>[
+                                    Text((session.status == 1) ? '${product.totalOrderQtyOrdered}/${product.qty}' : (session.status == 0) ? '${product.totalOrderQtyOrdered}' : '',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: (session.status == 1) ? 15 : (session.status == 0) ? 30 : 30,
+                                          color: Colors.white
+                                      ),
+                                    ),
+                                    Text((session.status == 1) ? '₱${product.totalOrderAmount}' : (session.status == 0) ? '' : '',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: (session.status == 1) ? 15 : 0,
+                                          color: Colors.white
+                                      ),
+                                    ),
+                                    SizedBox(height: 5),
+                                    Text('${product.productName}',
+                                      style: TextStyle(
+                                        fontSize: 10,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(5),
+                                  color: Colors.amber[300],
+                                  boxShadow: [
+                                    BoxShadow(color: Colors.amber, spreadRadius: 1),
+                                  ],
+                                ),
+                              )
+                          );
+                        }).toList(),
+                      ),
+                    ),
+                    Expanded(
+                      child: Container(
+                        child: RefreshIndicator(
+                          onRefresh: () async {
+                            refreshSession();
+                            return false;
+                          },
+                          child: ListView(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            children: session.orders.map((order) {
+                              return Slidable(
+                                key: new Key(order.id.toString()),
+                                actionPane: SlidableDrawerActionPane(),
+                                actionExtentRatio: 0.25,
+                                actions: <Widget>[
+                                  new IconSlideAction(
+                                    caption: 'Items',
+                                    color: Colors.blue,
+                                    icon: Icons.list,
+                                    onTap: () {
+                                      OpenDialog(order);
+                                    },
+                                  ),
+                                  if (session.status == 1)
+                                    IconSlideAction(
+                                      caption: (order.status == 0) ? 'Paid' : 'Unpaid',
+                                      color: Colors.indigo,
+                                      icon: (order.status == 0) ? Icons.check : Icons.close,
+                                      onTap: () async {
+                                        if (order.status == 0) {
+                                          Map response = await OrdersData().payOrderResponse(order.id);
+                                          if (response['err'] == 0) {
+                                            setState(() {
+                                              session.orders[session.orders.indexOf(order)].status = 1;
+                                            });
+                                          } else {
+                                            _showErrorMessage('Woah!', response['msg']);
+                                          }
+                                        } else if(order.status == 1) {
+                                          Map response = await OrdersData().unpayOrderResponse(order.id);
+                                          if (response['err'] == 0) {
+                                            setState(() {
+                                              session.orders[session.orders.indexOf(order)].status = 0;
+                                            });
+                                          } else {
+                                            _showErrorMessage('Woah!', response['msg']);
+                                          }
+                                        }
+                                      },
+                                    ),
+                                ],
+                                secondaryActions: <Widget>[
+                                  new IconSlideAction(
+                                    caption: 'Edit',
+                                    color: Colors.black45,
+                                    icon: Icons.edit,
+                                    onTap: () async {
+                                      dynamic received = await Navigator.pushNamed(context, '/edit_order', arguments: {
+                                        'session_id': session.id,
+                                        'order_id': order.id,
+                                        'customer_name': '${order.customerFName} ${order.customerLName}',
+                                        'order_items': jsonEncode(order.items)
+                                      });
+
+                                      refreshSession();
+                                    },
+                                  ),
+                                  new IconSlideAction(
+                                    caption: 'Delete',
+                                    color: Colors.red,
+                                    icon: Icons.delete,
+                                    onTap: () async {
+//                                bool del = await deleteConfirmation();
+                                      //                          if (del) {
+                                      Map responseMap = await OrdersData().deleteOrderResponse(order_id: order.id);
+
+                                      if (responseMap['err'] == 0) {
+                                        setState(() {
+                                          session.orders.remove(order);
+                                        });
+                                      } else {
+                                        _showErrorMessage('Woah!', responseMap['msg']);
+                                      }
+                                      //                          }
+                                    },
+                                  ),
+                                ],
+                                child: OrderRow(
+                                  order: order,
+                                ),
+                              );
+                            }).toList(),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: <Widget>[
+                        Text('TOTAL :'),
+                        SizedBox(width: 10),
+                        if (session.status == 1)
+                          Text(
+                            '₱${session.total_paid().toString()} ',
+                            style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 25,
+                                color: Colors.pinkAccent[100]
+                            ),
+                          ),
+                        if (session.status == 1)
+                          Text('/',style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15
+                          ),),
+                        Text(
+                          '₱${session.total().toString()}',
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: (session.status == 1) ? 15 : 20
+                          ),
+                        ),
+                      ],
+                    )
+                  ],
                 ),
               ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: <Widget>[
-                  Text('TOTAL :'),
-                  SizedBox(width: 10),
-                  if (session.status == 1)
-                  Text(
-                    '₱${session.total_paid().toString()} ',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 25,
-                      color: Colors.pinkAccent[100]
-                    ),
-                  ),
-                  if (session.status == 1)
-                    Text('/',style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 15
-                    ),),
-                  Text(
-                    '₱${session.total().toString()}',
-                    style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: (session.status == 1) ? 15 : 20
-                    ),
-                  ),
-                ],
-              )
-            ],
-          ),
+            ),
+          ],
         )
         : Padding(
           padding: EdgeInsets.all(10),
-          child: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                Icon(Icons.error_outline, size: 150, color: Colors.pink[100]),
-                Text('There are no session to be displayed\nat the moment.',
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                    fontSize: 18
-                  ),
-                ),
-                RaisedButton(
-                  onPressed: () async {
-                    await Navigator.pushNamed(context, '/new_session');
-                    refreshSession();
-                  },
-                  child: Text('Add new session',
+          child: Container(
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  Icon(Icons.error_outline, size: 150, color: Colors.pink[100]),
+                  Text('There are no session to be displayed\nat the moment.',
+                    textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Colors.white
+                      fontSize: 18
                     ),
                   ),
-                  color: Colors.pinkAccent[100],
-                )
-              ],
+                  RaisedButton(
+                    onPressed: () async {
+                      await Navigator.pushNamed(context, '/new_session');
+                      refreshSession();
+                    },
+                    child: Text('Add new session',
+                      style: TextStyle(
+                        color: Colors.white
+                      ),
+                    ),
+                    color: Colors.pinkAccent[100],
+                  )
+                ],
+              ),
             ),
           ),
         ),

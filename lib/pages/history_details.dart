@@ -11,6 +11,7 @@ class HistoryDetails extends StatefulWidget {
 class _HistoryDetailsState extends State<HistoryDetails> {
   int session_id;
   int user_id;
+  bool loading = false;
 
   Map data;
   Session session = Session();
@@ -18,8 +19,12 @@ class _HistoryDetailsState extends State<HistoryDetails> {
 
   void setSession() async {
     if (!loaded_session) {
+      setState(() {
+        loading = true;
+      });
       Session temp = await SessionsData().getSessionByProduct(session_id, user_id);
       setState(() {
+        loading = false;
         session = temp;
         loaded_session = true;
       });
@@ -49,8 +54,28 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                 user_id = null;
               }
 
+              setState(() {
+                loading = true;
+              });
+
               Session temp = await SessionsData().getSessionByProduct(session_id, user_id);
               setState(() {
+                loading = false;
+                session = temp;
+                loaded_session = true;
+              });
+            },
+          ),
+          IconButton(
+            icon: Icon(Icons.refresh),
+            onPressed: () async {
+              setState(() {
+                loading = true;
+              });
+
+              Session temp = await SessionsData().getSessionByProduct(session_id, user_id);
+              setState(() {
+                loading = false;
                 session = temp;
                 loaded_session = true;
               });
@@ -58,115 +83,126 @@ class _HistoryDetailsState extends State<HistoryDetails> {
           ),
         ],
       ),
-      body: (session.id != null) ? Container(
-        padding: EdgeInsets.all(10),
-        child: Column(
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.symmetric(vertical: 10),
-              child: Row(
+      body: (session.id != null) ? Column(
+        children: <Widget>[
+          if(loading)
+          LinearProgressIndicator(
+            backgroundColor: Colors.pinkAccent,
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.pink),
+          ),
+          Expanded(
+            child: Container(
+              padding: EdgeInsets.all(10),
+              child: Column(
                 children: <Widget>[
-                  Text('${session.startDate} to ${session.endDate}'),
-                  Expanded(
+                  Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 10),
                     child: Row(
-                      mainAxisAlignment: MainAxisAlignment.end,
                       children: <Widget>[
-                        Text('₱${session.total_paid()}',
-                          style: TextStyle(
-                              fontSize: 23,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.pinkAccent
-                          ),
-                        ),
-                        Text('/₱${session.total()}',
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold
-                          ),
-                        ),
-                      ],
-                    ),
-                  )
-                ],
-              ),
-            ),
-            Expanded(
-              child: ListView(
-                children: session.products.map((product) {
-                  return Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Row(
-                        children: <Widget>[
-                          Text('${product.productName}',
-                            style: TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold
-                            ),
-                          ),
-                          Expanded(
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: <Widget>[
-                                Text('₱${product.totalPaid()}',
-                                  style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.pinkAccent
-                                  ),
-                                ),
-                                Text('/₱${product.total()}',
-                                  style: TextStyle(
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.bold
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
-                      Column(
-                        children: product.orderItems.map((item) {
-                          return Row(
+                        Text('${session.startDate} to ${session.endDate}'),
+                        Expanded(
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
                             children: <Widget>[
-                              SizedBox(width: 15),
-                              Text('${item.qty} ',
+                              Text('₱${session.total_paid()}',
                                 style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 17
+                                    fontSize: 23,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.pinkAccent
                                 ),
                               ),
-                              Text('${item.order.customerFName} '),
-                              Text('${item.order.customerLName} '),
-                              Text('x ${item.price} '),
-                              if (item.order.status == 1)
-                                Text('(Paid)',
-                                  style: TextStyle(
-                                      color: Colors.amber
-                                  ),
-                                ),
-                              Expanded(
-                                child: Text('₱${item.totalComuted()} ',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 17
-                                  ),
-                                  textAlign: TextAlign.end,
+                              Text('/₱${session.total()}',
+                                style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold
                                 ),
                               ),
                             ],
-                          );
-                        }).toList(),
-                      ),
-                      SizedBox(height: 15)
-                    ],
-                  );
-                }).toList(),
+                          ),
+                        )
+                      ],
+                    ),
+                  ),
+                  Expanded(
+                    child: ListView(
+                      children: session.products.map((product) {
+                        return Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            Row(
+                              children: <Widget>[
+                                Text('${product.productName}',
+                                  style: TextStyle(
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.bold
+                                  ),
+                                ),
+                                Expanded(
+                                  child: Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: <Widget>[
+                                      Text('₱${product.totalPaid()}',
+                                        style: TextStyle(
+                                            fontSize: 20,
+                                            fontWeight: FontWeight.bold,
+                                            color: Colors.pinkAccent
+                                        ),
+                                      ),
+                                      Text('/₱${product.total()}',
+                                        style: TextStyle(
+                                            fontSize: 15,
+                                            fontWeight: FontWeight.bold
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              ],
+                            ),
+                            Column(
+                              children: product.orderItems.map((item) {
+                                return Row(
+                                  children: <Widget>[
+                                    SizedBox(width: 15),
+                                    Text('${item.qty} ',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 17
+                                      ),
+                                    ),
+                                    Text('${item.order.customerFName} '),
+                                    Text('${item.order.customerLName} '),
+                                    Text('x ${item.price} '),
+                                    if (item.order.status == 1)
+                                      Text('(Paid)',
+                                        style: TextStyle(
+                                            color: Colors.amber
+                                        ),
+                                      ),
+                                    Expanded(
+                                      child: Text('₱${item.totalComuted()} ',
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 17
+                                        ),
+                                        textAlign: TextAlign.end,
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              }).toList(),
+                            ),
+                            SizedBox(height: 15)
+                          ],
+                        );
+                      }).toList(),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ) : Container(
         child: Center(
           child: Column(

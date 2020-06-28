@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:lifesweettreatsordernotes/requests/users.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -11,6 +12,7 @@ class _LoginState extends State<Login> {
   String email;
   String password;
   String message;
+  bool loading = false;
 
   @override
   Widget build(BuildContext context) {
@@ -49,10 +51,20 @@ class _LoginState extends State<Login> {
                 ),
                 SizedBox(
                   width: double.infinity,
-                  child: RaisedButton.icon(
+                  child: (loading) ? SpinKitThreeBounce(
+                      color: Colors.pinkAccent,
+                      size: 30.0,
+                    ) : RaisedButton.icon(
                     color: Colors.pinkAccent[100],
                     onPressed: () async {
+                      setState(() {
+                        loading = true;
+                        message = null;
+                      });
                       Map response = await UsersData().login(email, password);
+                      setState(() {
+                        loading = false;
+                      });
                       print(response);
                       if ((response['err'] == 0) && (response['user_id'] != 0)) {
                         SharedPreferences.setMockInitialValues({});

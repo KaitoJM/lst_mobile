@@ -18,14 +18,21 @@ class _NewSessionFormState extends State<NewSessionForm> {
   dynamic data;
   List<Product> products = List<Product>();
   List<SessionProduct> productItems = List<SessionProduct>();
+  bool loading = false;
 
   Session form = Session(startDate: '', products: List<SessionProduct>());
   Product selectedProduct;
 
   Future <List<Product>> getProducts() async {
     print('Loading products');
+    setState(() {
+      loading = true;
+    });
     Response response = await get('${global.api_url}get-products');
     print('Loaded products');
+    setState(() {
+      loading = false;
+    });
     List<dynamic> productTemp = jsonDecode(response.body);
     products.clear();
 
@@ -88,177 +95,194 @@ class _NewSessionFormState extends State<NewSessionForm> {
         backgroundColor: Colors.pinkAccent[100],
         elevation: 0.0,
       ),
-      body: Container(
-
-        padding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
-        child: ListView(
-          children: <Widget>[
-            SizedBox(height: 20),
-            Text('SESSION INFORMATION'),
-            SizedBox(height: 10),
-            TextFormField(
-              initialValue: form.name,
-              onChanged: (val) {
-                form.name = val;
-              },
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                labelText: 'Name',
-              ),
-            ),
-            SizedBox(height: 10),
-            SizedBox(height: 10),
-            OutlineButton.icon(
-              padding: EdgeInsets.all(10),
-              icon: Icon(Icons.date_range, color: Colors.pinkAccent),
-              label: Text((form.startDate == null) ? 'Schedule Date' : '${form.startDate}',
-                style: TextStyle(
-                  color: Colors.pinkAccent
-                ),
-              ),
-              borderSide: BorderSide(
-                color: Colors.pinkAccent,
-                width: 2
-              ),
-              onPressed: () {
-                showDatePicker(
-                    context: context,
-                    initialDate: DateTime.now(),
-                    firstDate: DateTime.now(),
-                    lastDate: DateTime(2022)
-                ).then((date) {
-                  print(date.toString());
-                  setState(() {
-                    form.startDate = date.toString();
-                  });
-                });
-              },
-            ),
-            SizedBox(height: 10),
-            Divider(height: 10),
-            SizedBox(height: 10),
-            Text('PRODUCTS AVAILABLE'),
-            SizedBox(height: 10),
-            SizedBox(height: 10),
-            Row(
-              children: <Widget>[
-                Expanded(
-                  child: DropdownButtonFormField<Product>(
-                    isExpanded: true,
-                    value: selectedProduct,
-                    items: products.map((Product value) {
-                      return new DropdownMenuItem<Product>(
-                        value: value,
-                        child: new Text('${value.name}'),
-                      );
-                    }).toList(),
+      body: Column(
+        children: <Widget>[
+          if (loading)
+          LinearProgressIndicator(
+            backgroundColor: Colors.pinkAccent,
+            valueColor: AlwaysStoppedAnimation<Color>(Colors.pink),
+          ),
+          Expanded(
+            child: Container(
+              padding: EdgeInsets.symmetric(vertical: 5, horizontal: 15),
+              child: ListView(
+                children: <Widget>[
+                  SizedBox(height: 20),
+                  Text('SESSION INFORMATION'),
+                  SizedBox(height: 10),
+                  TextFormField(
+                    initialValue: form.name,
+                    onChanged: (val) {
+                      form.name = val;
+                    },
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),
-                      labelText: 'Products',
+                      labelText: 'Name',
                     ),
-                    onChanged: (val) {
-                      selectedProduct = val;
+                  ),
+                  SizedBox(height: 10),
+                  SizedBox(height: 10),
+                  OutlineButton.icon(
+                    padding: EdgeInsets.all(10),
+                    icon: Icon(Icons.date_range, color: Colors.pinkAccent),
+                    label: Text((form.startDate == null) ? 'Schedule Date' : '${form.startDate}',
+                      style: TextStyle(
+                        color: Colors.pinkAccent
+                      ),
+                    ),
+                    borderSide: BorderSide(
+                      color: Colors.pinkAccent,
+                      width: 2
+                    ),
+                    onPressed: () {
+                      showDatePicker(
+                          context: context,
+                          initialDate: DateTime.now(),
+                          firstDate: DateTime.now(),
+                          lastDate: DateTime(2022)
+                      ).then((date) {
+                        print(date.toString());
+                        setState(() {
+                          form.startDate = date.toString();
+                        });
+                      });
                     },
                   ),
-                ),
-                IconButton(
-                  padding: EdgeInsets.all(20),
-                  onPressed: () {
-                    print(selectedProduct);
-                    setState(() {
-                      form.products.add(
-                          SessionProduct(
-                            productId: selectedProduct.id,
-                            productName: selectedProduct.name,
-                            price: selectedProduct.price,
-                            qty: 0,
-                          )
-                      );
-                    });
-                  },
-                  icon: Icon(Icons.add,
-                    color: Colors.black54,
-                  ),
-                )
-              ],
-            ),
-            SizedBox(height: 10),
-            Column(
-                children: form.products.map((item) {
-                  return Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  SizedBox(height: 10),
+                  Divider(height: 10),
+                  SizedBox(height: 10),
+                  Text('PRODUCTS AVAILABLE'),
+                  SizedBox(height: 10),
+                  SizedBox(height: 10),
+                  Row(
                     children: <Widget>[
-                      Expanded(flex: 8, child: Text(item.productName)),
                       Expanded(
-                        flex: 2,
-                        child: TextFormField(
-                          initialValue: item.qty.toString(),
-                          onChanged: (val) {
-                            setState(() {
-                              form.products[form.products.indexOf(item)].qty = int.parse(val);
-                            });
-                          },
-                          keyboardType: TextInputType.number,
+                        child: DropdownButtonFormField<Product>(
+                          isExpanded: true,
+                          value: selectedProduct,
+                          items: products.map((Product value) {
+                            return new DropdownMenuItem<Product>(
+                              value: value,
+                              child: new Text('${value.name}'),
+                            );
+                          }).toList(),
                           decoration: InputDecoration(
-                            contentPadding: EdgeInsets.all(0),
-                            labelText: 'Qty',
+                            border: OutlineInputBorder(),
+                            labelText: 'Products',
                           ),
+                          onChanged: (val) {
+                            selectedProduct = val;
+                          },
                         ),
                       ),
-                      SizedBox(width: 10),
-                      Expanded(flex: 2, child: Text('${item.price}')),
                       IconButton(
+                        padding: EdgeInsets.all(20),
                         onPressed: () {
-                          form.products.remove(item);
-
+                          print(selectedProduct);
                           setState(() {
-                            form.products.remove(item);
+                            form.products.add(
+                                SessionProduct(
+                                  productId: selectedProduct.id,
+                                  productName: selectedProduct.name,
+                                  price: selectedProduct.price,
+                                  qty: 0,
+                                )
+                            );
                           });
                         },
-                        icon: Icon(Icons.clear),
+                        icon: Icon(Icons.add,
+                          color: Colors.black54,
+                        ),
                       )
                     ],
-                  );
-                }).toList()
-            ),
-            SizedBox(height: 10),
-            RaisedButton.icon(
-              padding: EdgeInsets.all(10),
-              onPressed: () async {
-                print('Adding session..');
-                Response response = await post('${global.api_url}add-session',
-                    headers: <String, String>{
-                      'Content-Type': 'application/json; charset=UTF-8',
+                  ),
+                  SizedBox(height: 10),
+                  Column(
+                      children: form.products.map((item) {
+                        return Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Expanded(flex: 8, child: Text(item.productName)),
+                            Expanded(
+                              flex: 2,
+                              child: TextFormField(
+                                initialValue: item.qty.toString(),
+                                onChanged: (val) {
+                                  setState(() {
+                                    form.products[form.products.indexOf(item)].qty = int.parse(val);
+                                  });
+                                },
+                                keyboardType: TextInputType.number,
+                                decoration: InputDecoration(
+                                  contentPadding: EdgeInsets.all(0),
+                                  labelText: 'Qty',
+                                ),
+                              ),
+                            ),
+                            SizedBox(width: 10),
+                            Expanded(flex: 2, child: Text('${item.price}')),
+                            IconButton(
+                              onPressed: () {
+                                form.products.remove(item);
+
+                                setState(() {
+                                  form.products.remove(item);
+                                });
+                              },
+                              icon: Icon(Icons.clear),
+                            )
+                          ],
+                        );
+                      }).toList()
+                  ),
+                  SizedBox(height: 10),
+                  RaisedButton.icon(
+                    padding: EdgeInsets.all(10),
+                    onPressed: () async {
+                      if (!loading) {
+                        print('Adding session..');
+                        setState(() {
+                          loading = true;
+                        });
+                        Response response = await post('${global.api_url}add-session',
+                            headers: <String, String>{
+                              'Content-Type': 'application/json; charset=UTF-8',
+                            },
+                            body: jsonEncode(<String, dynamic>{
+                              'id': form.id,
+                              'name': form.name,
+                              'start_date': form.startDate,
+                              'products': jsonEncode(form.products)
+                            })
+                        );
+                        setState(() {
+                          loading = false;
+                        });
+                        print('finished Add action..');
+                        print(response.body);
+                        Map responseMap = json.decode(response.body);
+
+                        if (responseMap['err'] == 0) {
+                          Navigator.pop(context, true);
+                        } else {
+                          _showErrorMessage('Woah!', responseMap['msg']);
+                        }
+                      }
                     },
-                    body: jsonEncode(<String, dynamic>{
-                      'id': form.id,
-                      'name': form.name,
-                      'start_date': form.startDate,
-                      'products': jsonEncode(form.products)
-                    })
-                );
-                print('finished Add action..');
-                print(response.body);
-                Map responseMap = json.decode(response.body);
-
-                if (responseMap['err'] == 0) {
-                  Navigator.pop(context, true);
-                } else {
-                  _showErrorMessage('Woah!', responseMap['msg']);
-                }
-
-              },
-              icon: Icon(Icons.save_alt, color: Colors.white),
-              label: Text(
-                  'Schedule Session',
-                  style: TextStyle(
-                    color: Colors.white
+                    icon: Icon((loading) ? Icons.more_horiz : Icons.save_alt, color: Colors.white),
+                    label: Text(
+                        (loading) ? 'Loading...' : 'Schedule Session',
+                        style: TextStyle(
+                          color: Colors.white
+                        )
+                    ),
+                    color: Colors.pinkAccent,
                   )
+                ],
               ),
-              color: Colors.pinkAccent,
-            )
-          ],
-        ),
+            ),
+          ),
+        ],
       ),
     );
   }
