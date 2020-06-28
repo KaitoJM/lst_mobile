@@ -262,14 +262,15 @@ class SessionsData {
     return option_temp;
   }
 
-  Future<Session> getSessionByProduct(int session_id) async {
+  Future<Session> getSessionByProduct(int session_id, int user_id) async {
     print('Loading session details...');
     Response response = await post('${global.api_url}get-session-by-product',
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
         body: jsonEncode(<String, dynamic>{
-          'session_id': session_id
+          'session_id': session_id,
+          'user_id': user_id
         })
     );
     print('Fetching session details done.');

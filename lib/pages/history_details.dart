@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:lifesweettreatsordernotes/models/session.dart';
 import 'package:lifesweettreatsordernotes/requests/sessions.dart';
+import 'package:lifesweettreatsordernotes/requests/users.dart';
 
 class HistoryDetails extends StatefulWidget {
   @override
@@ -9,13 +10,15 @@ class HistoryDetails extends StatefulWidget {
 
 class _HistoryDetailsState extends State<HistoryDetails> {
   int session_id;
+  int user_id;
+
   Map data;
   Session session = Session();
   bool loaded_session = false;
 
   void setSession() async {
     if (!loaded_session) {
-      Session temp = await SessionsData().getSessionByProduct(session_id);
+      Session temp = await SessionsData().getSessionByProduct(session_id, user_id);
       setState(() {
         session = temp;
         loaded_session = true;
@@ -36,6 +39,24 @@ class _HistoryDetailsState extends State<HistoryDetails> {
         centerTitle: true,
         backgroundColor: Colors.grey,
         elevation: 0.0,
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.assignment),
+            onPressed: () async {
+              if (user_id == null) {
+                user_id = await UsersData().userId();
+              } else {
+                user_id = null;
+              }
+
+              Session temp = await SessionsData().getSessionByProduct(session_id, user_id);
+              setState(() {
+                session = temp;
+                loaded_session = true;
+              });
+            },
+          ),
+        ],
       ),
       body: (session.id != null) ? Container(
         padding: EdgeInsets.all(10),

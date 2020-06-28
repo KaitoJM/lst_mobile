@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:lifesweettreatsordernotes/requests/users.dart';
 
 import 'package:lifesweettreatsordernotes/models/session.dart';
 
@@ -14,13 +15,17 @@ class _LoadingState extends State<Loading> {
   Session session;
 
   void getData() async {
+    int userId =  await UsersData().userId();
 
-    session = await SessionsData().currentSession();
+    if (userId == 0) {
+      Navigator.pushReplacementNamed(context, '/login');
+    } else {
+      session = await SessionsData().currentSession();
 
-    Navigator.pushReplacementNamed(context, '/home', arguments: {
-      'session': session
-    });
-
+      Navigator.pushReplacementNamed(context, '/home', arguments: {
+        'session': session
+      });
+    }
   }
 
   @override

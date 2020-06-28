@@ -6,12 +6,14 @@ import 'pages/home.dart';
 import 'pages/order_form.dart';
 import 'pages/loading.dart';
 import 'pages/edit_order_items.dart';
+import 'pages/login.dart';
 
 void main() {
   runApp(MaterialApp(
     debugShowCheckedModeBanner: false,
     initialRoute: '/loading',
     routes: {
+      '/login': (context) => Login(),
       '/home': (context) => OrderList(),
       '/loading': (context) => Loading(),
       '/edit_order': (context) => EditOrderItems(),

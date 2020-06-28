@@ -46,7 +46,7 @@ class SideMenu extends StatelessWidget {
                 ),
                 ListTile(
                   leading: Icon(Icons.person),
-                  title: Text('My Account'),
+                  title: Text('My Assignment'),
                   onTap: (){},
                 ),
               ],

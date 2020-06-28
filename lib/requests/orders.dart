@@ -76,7 +76,7 @@ class OrdersData {
 
   Future<Map> unpayOrderResponse(int order_id) async {
     print('Rollback payment...');
-    Response response = await post('${global.api_url}pay-order',
+    Response response = await post('${global.api_url}unpay-order',
         headers: <String, String>{
           'Content-Type': 'application/json; charset=UTF-8',
         },
