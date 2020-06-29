@@ -38,9 +38,19 @@ class UsersData {
           'password': password
         })
     );
-    print('Login request done.');
+    var data = json.decode(response.body);
+    if(response.statusCode == 200)
+      {
+        final prefs = await SharedPreferences.getInstance();
+        prefs.setString('key', email);
+        prefs.setString('key', password);
+        return data;
+      }
+    return null;
 
-    return json.decode(response.body);
+//    print('Login request done.');
+
+//    return json.decode(response.body);
   }
 
   Future<int> userId() async {
