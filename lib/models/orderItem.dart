@@ -10,6 +10,7 @@ class OrderItem {
   int qty;
   double total;
   Order order;
+  bool loading = false; //used on pay / unpay request
 
   OrderItem({this.id, this.image, this.price, this.productId, this.productName, this.sessionProductId, this.qty, this.total, this.order});
 

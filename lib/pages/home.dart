@@ -299,10 +299,32 @@ class _OrderListState extends State<OrderList> {
           backgroundColor: Colors.pinkAccent[100],
         ) : null,
         appBar: AppBar(
-          title: Text((session.status == 1) ? 'Today\'s Orders' : (session.status == 0) ? 'Pending Session' : 'No Session'),
+          title: Text((session.status == 1) ? 'Today\'s Orders' : (session.status == 0) ? 'Preparation' : 'No Session'),
           centerTitle: true,
           backgroundColor: Colors.pinkAccent[100],
           elevation: 0.0,
+          actions: <Widget>[
+            if(session.status == 0)
+            IconButton(
+              icon: Icon(Icons.settings),
+              onPressed: (){
+                Navigator.pushNamed(context, '/new_session', arguments: {
+                  'session': session
+                });
+
+                refreshSession();
+              },
+            ),
+            if(session.status == 1)
+              IconButton(
+                icon: Icon(Icons.assignment),
+                onPressed: (){
+                  Navigator.pushNamed(context, '/assignments', arguments: {
+                    'session_id': session.id
+                  });
+                },
+              )
+          ],
         ),
         drawer: SideMenu(),
         body: (session.id != null) ? Column(
@@ -361,13 +383,33 @@ class _OrderListState extends State<OrderList> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
-                                    Text((session.status == 1) ? '${product.totalOrderQtyOrdered}/${product.qty}' : (session.status == 0) ? '${product.totalOrderQtyOrdered}' : '',
-                                      style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          fontSize: (session.status == 1) ? 15 : (session.status == 0) ? 30 : 30,
-                                          color: Colors.white
-                                      ),
+                                    Row(
+                                      crossAxisAlignment: CrossAxisAlignment.end,
+                                      children: <Widget>[
+                                        Text('${product.totalOrderQtyOrdered}',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: (session.status == 1) ? 15 : (session.status == 0) ? 30 : 30,
+                                              color: Colors.white
+                                          ),
+                                        ),
+                                        if ((session.status == 1) || (product.qty > 0))
+                                        Text('/${product.qty}',
+                                          style: TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 15,
+                                              color: Colors.white
+                                          ),
+                                        ),
+                                      ],
                                     ),
+//                                    Text(((session.status == 1) || (product.qty > 0)) ? '${product.totalOrderQtyOrdered}/${product.qty}' : (session.status == 0) ? '${product.totalOrderQtyOrdered}' : '',
+//                                      style: TextStyle(
+//                                          fontWeight: FontWeight.bold,
+//                                          fontSize: (session.status == 1) ? 15 : (session.status == 0) ? 30 : 30,
+//                                          color: Colors.white
+//                                      ),
+//                                    ),
                                     Text((session.status == 1) ? '₱${product.totalOrderAmount}' : (session.status == 0) ? '' : '',
                                       style: TextStyle(
                                           fontWeight: FontWeight.bold,

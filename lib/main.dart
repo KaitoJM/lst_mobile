@@ -7,6 +7,7 @@ import 'pages/order_form.dart';
 import 'pages/loading.dart';
 import 'pages/edit_order_items.dart';
 import 'pages/login.dart';
+import 'pages/assignments.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -21,6 +22,7 @@ void main() {
       '/new_session': (context) => NewSessionForm(),
       '/new_order': (context) => OrderForm(),
       '/history_details': (context) => HistoryDetails(),
+      '/assignments': (context) => Assignments(),
     },
   ));
 }

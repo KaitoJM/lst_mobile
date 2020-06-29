@@ -42,15 +42,16 @@ class UsersData {
     if(response.statusCode == 200)
       {
         final prefs = await SharedPreferences.getInstance();
-        prefs.setString('key', email);
-        prefs.setString('key', password);
+//        prefs.setInt('user_id', data['user_id']);
+//        prefs.setString('key', email);
+//        prefs.setString('key', password);
         return data;
       }
-    return null;
+//    return null;
 
 //    print('Login request done.');
 
-//    return json.decode(response.body);
+    return json.decode(response.body);
   }
 
   Future<int> userId() async {
