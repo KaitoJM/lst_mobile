@@ -55,13 +55,13 @@ class UsersData {
   }
 
   Future<int> userId() async {
-    SharedPreferences.setMockInitialValues({});
+//    SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
     return prefs.getInt('user_id') ?? 0;
   }
 
   Future logOut() async {
-    SharedPreferences.setMockInitialValues({});
+//    SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
 
     prefs.setInt('user_id', 0);
