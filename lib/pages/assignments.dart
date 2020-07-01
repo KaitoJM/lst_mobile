@@ -134,14 +134,14 @@ class _AssignmentsState extends State<Assignments> {
                                   children: <Widget>[
                                     SizedBox(width: 15),
                                     (item.loading) ?
-                                      SizedBox(
-                                        width: 24,
-                                        child: SpinKitRing(
-                                          color: Colors.green,
-                                          size: 18.0,
-                                          lineWidth: 2,
-                                        ),
-                                      ) :
+                                    SizedBox(
+                                      width: 24,
+                                      child: SpinKitRing(
+                                        color: Colors.green,
+                                        size: 18.0,
+                                        lineWidth: 2,
+                                      ),
+                                    ) :
                                     GestureDetector(
                                       child: Icon((item.order.status == 1) ? Icons.check_box : Icons.check_box_outline_blank,
                                         color: Colors.green[200],

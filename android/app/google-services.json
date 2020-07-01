@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "655829940910",
+    "firebase_url": "https://life-sweet-treat.firebaseio.com",
+    "project_id": "life-sweet-treat",
+    "storage_bucket": "life-sweet-treat.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:655829940910:android:800c584dbf3355c23c8b3f",
+        "android_client_info": {
+          "package_name": "com.example.lifesweettreatsordernotes"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "655829940910-s49hoekn19qnoirel2jc1ah02b7t3jqj.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBhEWj1g3n-A0enpbBRyl__e16_aj3DjJo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "655829940910-s49hoekn19qnoirel2jc1ah02b7t3jqj.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -380,8 +380,8 @@ class _OrderListState extends State<OrderList> {
                                 margin: EdgeInsets.all(3),
                                 height: 80,
                                 padding: EdgeInsets.symmetric(vertical: 7, horizontal: 10),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                child: ListView(
+//                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   children: <Widget>[
                                     Row(
                                       crossAxisAlignment: CrossAxisAlignment.end,
@@ -428,9 +428,19 @@ class _OrderListState extends State<OrderList> {
                                 ),
                                 decoration: BoxDecoration(
                                   borderRadius: BorderRadius.circular(5),
-                                  color: Colors.amber[300],
+                                  gradient: LinearGradient(
+                                    colors: [
+                                      (product.totalOrderQtyOrdered == product.qty) ? Colors.green[300] : (product.totalOrderQtyOrdered > product.qty) ? Colors.pink[300] : Colors.amber[300],
+                                      (product.totalOrderQtyOrdered == product.qty) ? Colors.green[600] : (product.totalOrderQtyOrdered > product.qty) ? Colors.pink[600] : Colors.amber[600],
+                                      (product.totalOrderQtyOrdered == product.qty) ? Colors.green[600] : (product.totalOrderQtyOrdered > product.qty) ? Colors.pink[600] : Colors.amber[600],
+                                      (product.totalOrderQtyOrdered == product.qty) ? Colors.green[300] : (product.totalOrderQtyOrdered > product.qty) ? Colors.pink[300] : Colors.amber[300],
+                                    ],
+                                    begin: const FractionalOffset(0.0, 0.0),
+                                    end: const FractionalOffset(0.0, 1.0),
+                                  ),
+                                  color: (product.totalOrderQtyOrdered == product.qty) ? Colors.green[300] : (product.totalOrderQtyOrdered > product.qty) ? Colors.pink[300] : Colors.amber[300],
                                   boxShadow: [
-                                    BoxShadow(color: Colors.amber, spreadRadius: 1),
+                                    BoxShadow(color: (product.totalOrderQtyOrdered == product.qty) ? Colors.green : (product.totalOrderQtyOrdered > product.qty) ? Colors.pink : Colors.amber, spreadRadius: 1),
                                   ],
                                 ),
                               )

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lifesweettreatsordernotes/pages/deliveries.dart';
 import 'package:lifesweettreatsordernotes/pages/new_session_form.dart';
 import 'package:lifesweettreatsordernotes/pages/sessions.dart';
 import 'pages/history_details.dart';
@@ -23,6 +24,7 @@ void main() {
       '/new_order': (context) => OrderForm(),
       '/history_details': (context) => HistoryDetails(),
       '/assignments': (context) => Assignments(),
+      '/deliveries': (context) => Deliveries(),
     },
   ));
 }

@@ -334,4 +334,80 @@ class SessionsData {
       return Session(name: '', startDate: '', orders: List<Order>(), products: List<SessionProduct>());
     }
   }
+
+  Future <List<Session>> getDeliveries() async {
+    print('Loading deliveries...');
+    Response response = await get('${global.api_url}deliveries');
+    print('Fetching deliveries done.');
+
+    List<Session> sessions = List<Session>();
+    Map responseData = json.decode(response.body);
+
+    print(responseData);
+
+    if (responseData['deliveries'] != null) {
+      List sessionsList = responseData['deliveries'];
+
+      if (sessionsList.length > 0) {
+        sessionsList.forEach((returnMap) {
+          List products = returnMap['session']['products'];
+          List<SessionProduct> sessionProducts = List<SessionProduct>();
+
+          products.forEach((prod) {
+            List<OrderItem> orderItems = List<OrderItem>();
+            List items = prod['order_items'];
+
+            items.forEach((item) {
+              Order order = Order(
+                  id: item['order']['id'],
+                  sessionId: item['order']['session_id'],
+                  customerId: item['order']['customer_id'],
+                  customerLName: item['order']['customer']['lname'],
+                  customerFName: item['order']['customer']['fname'],
+                  status: item['order']['status']
+              );
+
+              orderItems.add(
+                  OrderItem(
+                      id: item['id'],
+                      price: item['price'].toDouble(),
+                      sessionProductId: prod['id'],
+                      productId: item['product_id'],
+                      productName: prod['product']['name'],
+                      qty: item['qty'],
+                      order: order
+//              total: item['qty'] * prod['id'].toDouble()
+                  )
+              );
+            });
+
+            sessionProducts.add(
+                SessionProduct(
+                    id: prod['id'],
+                    productName: prod['product']['name'],
+                    productId: prod['product_id'],
+                    price: prod['product']['price'].toDouble(),
+                    qty: prod['quantity'],
+                    orderItems: orderItems
+                )
+            );
+          });
+
+          sessions.add(
+              Session(
+                  id: returnMap['session']['id'],
+                  name: returnMap['session']['name'],
+                  startDate: returnMap['session']['start_date'],
+                  endDate: returnMap['session']['end_date'],
+                  assigneeName: '${returnMap['user']['fname']} ${returnMap['user']['lname']}',
+                  products: sessionProducts
+              )
+          );
+        });
+      }
+
+    }
+
+    return sessions;
+  }
 }

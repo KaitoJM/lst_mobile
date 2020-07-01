@@ -16,7 +16,7 @@ class _LoadingState extends State<Loading> {
 
   void getData() async {
     int userId =  await UsersData().userId();
-
+    print('userid ${userId}');
     if (userId == 0) {
       Navigator.pushReplacementNamed(context, '/login');
     } else {

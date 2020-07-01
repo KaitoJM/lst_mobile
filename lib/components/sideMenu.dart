@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:lifesweettreatsordernotes/requests/users.dart';
 
 class SideMenu extends StatelessWidget {
   @override
@@ -45,9 +46,21 @@ class SideMenu extends StatelessWidget {
                   },
                 ),
                 ListTile(
-                  leading: Icon(Icons.person),
-                  title: Text('My Assignment'),
-                  onTap: (){},
+                  leading: Icon(Icons.motorcycle),
+                  title: Text('Deliveries'),
+                  onTap: (){
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, '/deliveries');
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.lock_outline),
+                  title: Text('Logout'),
+                  onTap: () async {
+                    Navigator.pop(context);
+                    await UsersData().logOut();
+                    Navigator.pushReplacementNamed(context, '/loading');
+                  },
                 ),
               ],
             ),

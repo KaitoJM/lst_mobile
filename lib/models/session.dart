@@ -10,7 +10,10 @@ class Session {
   List<Order> orders;
   List<SessionProduct> products;
 
-  Session({this.id, this.name, this.startDate, this.endDate, this.status, this.orders, this.products});
+
+  String assigneeName;
+
+  Session({this.id, this.name, this.startDate, this.endDate, this.status, this.orders, this.products, this.assigneeName});
 
   double total_paid() {
     double total = 0;
