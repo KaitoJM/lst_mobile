@@ -97,29 +97,69 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                 children: <Widget>[
                   Padding(
                     padding: const EdgeInsets.symmetric(vertical: 10),
-                    child: Row(
+                    child: Column(
                       children: <Widget>[
-                        Text('${session.startDate} to ${session.endDate}'),
-                        Expanded(
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: <Widget>[
-                              Text('₱${session.total_paid()}',
-                                style: TextStyle(
-                                    fontSize: 23,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.pinkAccent
-                                ),
+                        Row(
+                          children: <Widget>[
+                            Text('${session.startDate} to ${session.endDate}'),
+                            Expanded(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: <Widget>[
+                                  Text('₱${session.total_paid()}',
+                                    style: TextStyle(
+                                        fontSize: 23,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.pinkAccent
+                                    ),
+                                  ),
+                                  Text('/₱${session.total()}',
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold
+                                    ),
+                                  ),
+                                ],
                               ),
-                              Text('/₱${session.total()}',
-                                style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold
-                                ),
+                            )
+                          ],
+                        ),
+                        Row(
+                          children: <Widget>[
+                            Text('EXPENSE:'),
+                            Expanded(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: <Widget>[
+                                  Text('₱${session.expense}',
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ],
-                          ),
-                        )
+                            )
+                          ],
+                        ),
+                        Row(
+                          children: <Widget>[
+                            Text('PROFIT:'),
+                            Expanded(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: <Widget>[
+                                  Text('₱${session.total_paid() - session.expense}',
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
                       ],
                     ),
                   ),

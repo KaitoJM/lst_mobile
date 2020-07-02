@@ -7,13 +7,14 @@ class Session {
   String startDate;
   String endDate;
   int status;
+  double expense = 0;
   List<Order> orders;
   List<SessionProduct> products;
 
 
   String assigneeName;
 
-  Session({this.id, this.name, this.startDate, this.endDate, this.status, this.orders, this.products, this.assigneeName});
+  Session({this.id, this.name, this.startDate, this.endDate, this.status, this.orders, this.products, this.assigneeName, this.expense});
 
   double total_paid() {
     double total = 0;

@@ -190,6 +190,7 @@ class SessionsData {
               startDate: element['start_date'],
               endDate: element['end_date'],
               status: element['status'],
+              expense: element['expense'].toDouble(),
               orders: orders
           )
       );
@@ -328,6 +329,7 @@ class SessionsData {
         name: session_map['session']['name'],
         startDate: session_map['session']['start_date'],
         endDate: session_map['session']['end_date'],
+        expense: session_map['session']['expense'].toDouble(),
         products: sessionProducts
       );
     } else {
