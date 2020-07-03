@@ -53,4 +53,16 @@ class Session {
     return total;
   }
 
+  double totalIncome() {
+    double total = 0;
+
+    if (products != null) {
+      products.forEach((product) {
+        total += product.totalExpected();
+      });
+    }
+
+    return total;
+  }
+
 }

@@ -12,7 +12,6 @@ class SideMenu extends StatelessWidget {
             width: 310,
             height: 228,
             padding: EdgeInsets.fromLTRB(0, 50, 0, 25),
-            color: Colors.pinkAccent[100],
             child: Column(
               children: <Widget>[
                 SizedBox(
@@ -20,25 +19,34 @@ class SideMenu extends StatelessWidget {
                     child: Image(image: AssetImage('assets/lstlogo.png'))
                 )
               ],
-            )
+            ),
+            decoration: BoxDecoration(
+              gradient: RadialGradient(
+                colors: [
+                  Colors.white,
+                  Colors.pinkAccent[100],
+                  Colors.pinkAccent,
+                ]
+              )
+            ),
           ),
           Expanded(
             child: ListView(
               children: <Widget>[
                 ListTile(
-                  leading: Icon(Icons.home),
+                  leading: Icon(Icons.home, color: Colors.pink),
                   title: Text('Home'),
                   onTap: (){
 //                    Navigator.pushNamed(context, '/home');
                   },
                 ),
                 ListTile(
-                  leading: Icon(Icons.fastfood),
+                  leading: Icon(Icons.fastfood, color: Colors.pink),
                   title: Text('Products'),
                   onTap: (){},
                 ),
                 ListTile(
-                  leading: Icon(Icons.calendar_today),
+                  leading: Icon(Icons.calendar_today, color: Colors.pink),
                   title: Text('Sessions'),
                   onTap: (){
                     Navigator.pop(context);
@@ -46,7 +54,7 @@ class SideMenu extends StatelessWidget {
                   },
                 ),
                 ListTile(
-                  leading: Icon(Icons.motorcycle),
+                  leading: Icon(Icons.motorcycle, color: Colors.pink),
                   title: Text('Deliveries'),
                   onTap: (){
                     Navigator.pop(context);
@@ -54,7 +62,7 @@ class SideMenu extends StatelessWidget {
                   },
                 ),
                 ListTile(
-                  leading: Icon(Icons.lock_outline),
+                  leading: Icon(Icons.lock_outline, color: Colors.pink),
                   title: Text('Logout'),
                   onTap: () async {
                     Navigator.pop(context);

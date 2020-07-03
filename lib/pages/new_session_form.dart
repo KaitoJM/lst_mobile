@@ -20,7 +20,7 @@ class _NewSessionFormState extends State<NewSessionForm> {
   List<SessionProduct> productItems = List<SessionProduct>();
   bool loading = false;
 
-  Session form = Session(startDate: '', products: List<SessionProduct>());
+  Session form = Session(startDate: '', expense: 0, products: List<SessionProduct>());
   Product selectedProduct;
 
   Future <List<Product>> getProducts() async {
@@ -90,7 +90,7 @@ class _NewSessionFormState extends State<NewSessionForm> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('New Session'),
+        title: Text((form.id == null) ? 'New Session' : 'Edit Session'),
         centerTitle: true,
         backgroundColor: Colors.pinkAccent[100],
         elevation: 0.0,
@@ -118,6 +118,17 @@ class _NewSessionFormState extends State<NewSessionForm> {
                     decoration: InputDecoration(
                       border: OutlineInputBorder(),
                       labelText: 'Name',
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  TextFormField(
+                    initialValue: form.expense.toString(),
+                    onChanged: (val) {
+                      form.expense = double.parse(val);
+                    },
+                    decoration: InputDecoration(
+                      border: OutlineInputBorder(),
+                      labelText: 'Expense',
                     ),
                   ),
                   SizedBox(height: 10),
@@ -251,6 +262,7 @@ class _NewSessionFormState extends State<NewSessionForm> {
                             body: jsonEncode(<String, dynamic>{
                               'id': form.id,
                               'name': form.name,
+                              'expense': form.expense,
                               'start_date': form.startDate,
                               'products': jsonEncode(form.products)
                             })
@@ -271,7 +283,7 @@ class _NewSessionFormState extends State<NewSessionForm> {
                     },
                     icon: Icon((loading) ? Icons.more_horiz : Icons.save_alt, color: Colors.white),
                     label: Text(
-                        (loading) ? 'Loading...' : 'Schedule Session',
+                        (loading) ? 'Loading...' : (form.id != null) ? 'Save Session' : 'Schedule Session',
                         style: TextStyle(
                           color: Colors.white
                         )

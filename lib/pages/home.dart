@@ -124,7 +124,7 @@ class _OrderListState extends State<OrderList> {
     );
   }
 
-  Future<bool> deleteConfirmation() async {
+  Future<bool> deleteConfirmation(Order order) async {
     // flutter defined function
     showDialog(
       context: context,
@@ -132,7 +132,7 @@ class _OrderListState extends State<OrderList> {
         // return object of type Dialog
         return AlertDialog(
           title: new Text("Delete Confirmation"),
-          content: new Text("Canceling will remove the selected order. \nDo you wish to continue?"),
+          content: new Text("Cancelling will remove the selected order. \nDo you wish to continue?"),
           actions: <Widget>[
             // usually buttons at the bottom of the dialog
             new FlatButton(
@@ -143,7 +143,17 @@ class _OrderListState extends State<OrderList> {
             ),
             new FlatButton(
               child: new Text("PROCEED"),
-              onPressed: () {
+              onPressed: () async {
+                Map responseMap = await OrdersData().deleteOrderResponse(order_id: order.id);
+
+                if (responseMap['err'] == 0) {
+                  setState(() {
+                    session.orders.remove(order);
+                  });
+                } else {
+                  _showErrorMessage('Woah!', responseMap['msg']);
+                }
+
                 Navigator.of(context).pop(true);
               },
             ),
@@ -344,12 +354,25 @@ class _OrderListState extends State<OrderList> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
-                            Text(
-                              (session.name != null) ? session.name : '',
-                              style: TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.black54
-                              ),
+                            Column(
+                              children: <Widget>[
+                                Text(
+                                  (session.name != null) ? session.name : '',
+                                  style: TextStyle(
+                                      fontSize: 18,
+                                      color: Colors.black54
+                                  ),
+                                ),
+                                if (session.status == 1)
+                                  Text(
+                                    'INCOME: ₱${session.totalIncome()}',
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                              ],
+                              crossAxisAlignment: CrossAxisAlignment.start,
                             ),
                             OutlineButton.icon(
                               onPressed: () {
@@ -516,22 +539,11 @@ class _OrderListState extends State<OrderList> {
                                     },
                                   ),
                                   new IconSlideAction(
-                                    caption: 'Delete',
+                                    caption: 'Cancel',
                                     color: Colors.red,
                                     icon: Icons.delete,
                                     onTap: () async {
-//                                bool del = await deleteConfirmation();
-                                      //                          if (del) {
-                                      Map responseMap = await OrdersData().deleteOrderResponse(order_id: order.id);
-
-                                      if (responseMap['err'] == 0) {
-                                        setState(() {
-                                          session.orders.remove(order);
-                                        });
-                                      } else {
-                                        _showErrorMessage('Woah!', responseMap['msg']);
-                                      }
-                                      //                          }
+                                      await deleteConfirmation(order);
                                     },
                                   ),
                                 ],

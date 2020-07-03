@@ -108,14 +108,14 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                                 children: <Widget>[
                                   Text('₱${session.total_paid()}',
                                     style: TextStyle(
-                                        fontSize: 23,
+                                        fontSize: 18,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.pinkAccent
                                     ),
                                   ),
                                   Text('/₱${session.total()}',
                                     style: TextStyle(
-                                        fontSize: 18,
+                                        fontSize: 15,
                                         fontWeight: FontWeight.bold
                                     ),
                                   ),
@@ -124,6 +124,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                             )
                           ],
                         ),
+                        if (user_id == null)
                         Row(
                           children: <Widget>[
                             Text('EXPENSE:'),
@@ -142,6 +143,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                             )
                           ],
                         ),
+                        if (user_id == null)
                         Row(
                           children: <Widget>[
                             Text('PROFIT:'),
@@ -173,24 +175,25 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                               children: <Widget>[
                                 Text('${product.productName}',
                                   style: TextStyle(
-                                      fontSize: 20,
+                                      fontSize: 17,
                                       fontWeight: FontWeight.bold
                                   ),
                                 ),
+                                Text('(₱${product.price})'),
                                 Expanded(
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: <Widget>[
                                       Text('₱${product.totalPaid()}',
                                         style: TextStyle(
-                                            fontSize: 20,
+                                            fontSize: 17,
                                             fontWeight: FontWeight.bold,
                                             color: Colors.pinkAccent
                                         ),
                                       ),
                                       Text('/₱${product.total()}',
                                         style: TextStyle(
-                                            fontSize: 15,
+                                            fontSize: 13,
                                             fontWeight: FontWeight.bold
                                         ),
                                       ),
@@ -212,7 +215,6 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                                     ),
                                     Text('${item.order.customerFName} '),
                                     Text('${item.order.customerLName} '),
-                                    Text('x ${item.price} '),
                                     if (item.order.status == 1)
                                       Text('(Paid)',
                                         style: TextStyle(
@@ -223,7 +225,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                                       child: Text('₱${item.totalComuted()} ',
                                         style: TextStyle(
                                             fontWeight: FontWeight.bold,
-                                            fontSize: 17
+                                            fontSize: 15
                                         ),
                                         textAlign: TextAlign.end,
                                       ),

@@ -75,14 +75,14 @@ class _AssignmentsState extends State<Assignments> {
                             children: <Widget>[
                               Text('₱${session.total_paid()}',
                                 style: TextStyle(
-                                    fontSize: 23,
+                                    fontSize: 18,
                                     fontWeight: FontWeight.bold,
                                     color: Colors.pinkAccent
                                 ),
                               ),
                               Text('/₱${session.total()}',
                                 style: TextStyle(
-                                    fontSize: 18,
+                                    fontSize: 15,
                                     fontWeight: FontWeight.bold
                                 ),
                               ),
@@ -102,24 +102,25 @@ class _AssignmentsState extends State<Assignments> {
                               children: <Widget>[
                                 Text('${product.productName}',
                                   style: TextStyle(
-                                      fontSize: 20,
+                                      fontSize: 16,
                                       fontWeight: FontWeight.bold
                                   ),
                                 ),
+                                Text('(₱${product.price})'),
                                 Expanded(
                                   child: Row(
                                     mainAxisAlignment: MainAxisAlignment.end,
                                     children: <Widget>[
                                       Text('₱${product.totalPaid()}',
                                         style: TextStyle(
-                                            fontSize: 20,
+                                            fontSize: 15,
                                             fontWeight: FontWeight.bold,
                                             color: Colors.pinkAccent
                                         ),
                                       ),
                                       Text('/₱${product.total()}',
                                         style: TextStyle(
-                                            fontSize: 15,
+                                            fontSize: 13,
                                             fontWeight: FontWeight.bold
                                         ),
                                       ),
@@ -182,7 +183,6 @@ class _AssignmentsState extends State<Assignments> {
                                     ),
                                     Text('${item.order.customerFName} '),
                                     Text('${item.order.customerLName} '),
-                                    Text('x ${item.price} '),
                                     Expanded(
                                       child: Text('₱${item.totalComuted()} ',
                                         style: TextStyle(

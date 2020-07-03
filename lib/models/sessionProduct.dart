@@ -42,6 +42,12 @@ class SessionProduct {
     return total;
   }
 
+  double totalExpected() {
+    double total = 0;
+    total = qty * price;
+    return total;
+  }
+
   Map<String, dynamic> toJson(){
     return {
       "id": this.id,
