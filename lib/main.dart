@@ -9,6 +9,7 @@ import 'pages/loading.dart';
 import 'pages/edit_order_items.dart';
 import 'pages/login.dart';
 import 'pages/assignments.dart';
+import 'pages/transaction.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -25,6 +26,7 @@ void main() {
       '/history_details': (context) => HistoryDetails(),
       '/assignments': (context) => Assignments(),
       '/deliveries': (context) => Deliveries(),
+      '/transaction': (context) => Transaction()
     },
   ));
 }

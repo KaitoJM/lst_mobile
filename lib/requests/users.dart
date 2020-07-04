@@ -20,7 +20,8 @@ class UsersData {
           fname: user['fname'],
           lname: user['lname'],
           email: user['email'],
-          photo: user['photo']
+          photo: user['photo'],
+          type: user['type'],
       ));
     });
 
@@ -58,6 +59,16 @@ class UsersData {
 //    SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();
     return prefs.getInt('user_id') ?? 0;
+  }
+
+  Future<String> userType() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('user_type') ?? '';
+  }
+
+  Future<String> userName() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('user_name') ?? '';
   }
 
   Future logOut() async {

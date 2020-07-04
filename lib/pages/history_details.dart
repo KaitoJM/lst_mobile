@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:lifesweettreatsordernotes/models/session.dart';
 import 'package:lifesweettreatsordernotes/requests/sessions.dart';
@@ -11,6 +12,7 @@ class HistoryDetails extends StatefulWidget {
 class _HistoryDetailsState extends State<HistoryDetails> {
   int session_id;
   int user_id;
+  String user_type;
   bool loading = false;
 
   Map data;
@@ -31,12 +33,20 @@ class _HistoryDetailsState extends State<HistoryDetails> {
     }
   }
 
+  void getUserType() async {
+    String type = await UsersData().userType();
+    setState(() {
+      user_type = type;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     data = ModalRoute.of(context).settings.arguments;
 //    print(data);
     session_id = data['session_id'];
     setSession();
+    getUserType();
 
     return Scaffold(
       appBar: AppBar(
@@ -162,6 +172,21 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                             )
                           ],
                         ),
+                        if ((user_id == null) && (user_type == 'finance'))
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: <Widget>[
+                            OutlineButton.icon(
+                              onPressed: () {
+                                Navigator.pushReplacementNamed(context, '/transaction', arguments: {
+                                  'session_id': session_id
+                                });
+                              },
+                              label: Text('Manage Finance'),
+                              icon: Icon(Icons.monetization_on)
+                            )
+                          ],
+                        )
                       ],
                     ),
                   ),

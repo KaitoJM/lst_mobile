@@ -98,7 +98,9 @@ class _LoginState extends State<Login> {
                               if ((response['err'] == 0) && (response['user_id'] != 0)) {
 //                                SharedPreferences.setMockInitialValues({});
                                 final prefs = await SharedPreferences.getInstance();
-                                prefs.setInt('user_id', response['user_id']);
+                                prefs.setInt('user_id', response['user']['id']);
+                                prefs.setString('user_type', response['user']['type']);
+                                prefs.setString('user_name', '${response['user']['fname']} ${response['user']['lname']}');
                                 print('saved ${response['user_id']}');
 
                                 message = null;
