@@ -172,17 +172,19 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                             )
                           ],
                         ),
-                        if ((user_id == null) && (user_type == 'finance'))
                         Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: <Widget>[
                             OutlineButton.icon(
                               onPressed: () {
                                 Navigator.pushNamed(context, '/transaction', arguments: {
-                                  'session_id': session_id
+                                  'session_id': session_id,
+                                  'session_name': session.name,
+                                  'session_total': session.total(),
+                                  'session_total_paid': session.total_paid()
                                 });
                               },
-                              label: Text('Manage Finance'),
+                              label: Text((user_type == 'finance') ? 'Manage Finance' : 'Check Cash Deposits'),
                               icon: Icon(Icons.monetization_on)
                             )
                           ],

@@ -122,6 +122,7 @@ class _NewSessionFormState extends State<NewSessionForm> {
                   ),
                   SizedBox(height: 10),
                   TextFormField(
+                    keyboardType: TextInputType.number,
                     initialValue: form.expense.toString(),
                     onChanged: (val) {
                       form.expense = double.parse(val);

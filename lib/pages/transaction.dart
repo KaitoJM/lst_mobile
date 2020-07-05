@@ -1,9 +1,11 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:lifesweettreatsordernotes/models/Transaction.dart';
 
 import 'package:lifesweettreatsordernotes/models/user.dart';
 import 'package:lifesweettreatsordernotes/requests/transactions.dart';
+import 'package:lifesweettreatsordernotes/requests/users.dart';
 
 class Transaction extends StatefulWidget {
   @override
@@ -12,7 +14,11 @@ class Transaction extends StatefulWidget {
 
 class _TransactionState extends State<Transaction> {
   int session_id;
+  String sessionName;
+  double sessionTotal;
+  double sessionTotalPaid;
   bool loaded_transaction = false;
+  String user_type;
   List<User> users = List<User>();
 
   void getData() async {
@@ -27,11 +33,23 @@ class _TransactionState extends State<Transaction> {
 
   }
 
+  void getUserType() async {
+    String type = await UsersData().userType();
+    setState(() {
+      user_type = type;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     Map data = ModalRoute.of(context).settings.arguments;
     session_id = data['session_id'];
+    sessionName = data['session_name'];
+    sessionTotal = data['session_total'].toDouble();
+    sessionTotalPaid = data['session_total_paid'].toDouble();
     getData();
+
+    getUserType();
 
     return Scaffold(
       appBar: AppBar(
@@ -49,11 +67,34 @@ class _TransactionState extends State<Transaction> {
           )
         ],
       ),
-      body: Container(
+      body: (loaded_transaction) ? Container(
         padding: EdgeInsets.all(10),
         child: Column(
           children: <Widget>[
-            Text('Test'),
+            Padding(
+              padding: const EdgeInsets.symmetric(vertical: 10),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: <Widget>[
+                  Expanded(
+                      child: Text('${sessionName}',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 18
+                        ),
+                      )
+                  ),
+                  Text('₱${sessionTotalPaid}',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 18,
+                      color: Colors.pinkAccent
+                    ),
+                  ),
+                  Text('/₱${sessionTotal}')
+                ],
+              ),
+            ),
             Expanded(
               child: ListView(
                 children: users.map((user) {
@@ -79,7 +120,7 @@ class _TransactionState extends State<Transaction> {
                             Container(
                               padding: EdgeInsets.all(5),
                               decoration: BoxDecoration(
-                                color: Colors.black26,
+                                color: (user.totalAmountToBePaid() == user.totalCashReceived()) ? Colors.green : (user.totalAmountToBePaid() < user.totalCashReceived()) ? Colors.amber : Colors.black26,
                                 borderRadius: BorderRadius.circular(5)
                               ),
                               child: Text('₱${user.totalCashReceived()}',
@@ -115,7 +156,7 @@ class _TransactionState extends State<Transaction> {
                                     children: <Widget>[
                                       Expanded(child: Text('${transaction.createdDate}')),
                                       Text(
-                                        '${transaction.amount}',
+                                        '₱${transaction.amount}',
                                         style: TextStyle(
                                           fontWeight: FontWeight.bold
                                         ),
@@ -128,6 +169,7 @@ class _TransactionState extends State<Transaction> {
                           )
                         ],
                       ),
+                      if (user_type == 'finance')
                       Row(
                         children: <Widget>[
                           SizedBox(width: 20),
@@ -168,20 +210,28 @@ class _TransactionState extends State<Transaction> {
                                     ),
                                   ),
                                   SizedBox(width: 10),
+                                  if (!user.loadingAddingCash)
                                   OutlineButton.icon(
                                     icon: Icon(Icons.add),
                                     label: Text('Add'),
                                     onPressed: () async {
                                       print(user.cashRecieveAmount);
+                                      user.loadingAddingCash = true;
                                       Map res = await TransactionsData().addTransaction(session_id, user.id, user.cashRecieveAmount);
-
+                                      user.loadingAddingCash = false;
                                       if (res['err'] == 0) {
-//                                        user.transactions.add(
-//
-//                                        );
+                                        TransactionModel newTransaction = TransactionModel(id: res['id'], session_id: session_id, user_id: user.id, amount: user.cashRecieveAmount,createdDate: res['date']);
+                                        setState(() {
+                                          user.transactions.add(newTransaction);
+                                        });
                                       }
-                                      print(res);
                                     },
+                                  ) else SizedBox(
+                                    width: 100,
+                                    child: SpinKitThreeBounce(
+                                      color: Colors.pinkAccent,
+                                      size: 15,
+                                    ),
                                   )
                                 ],
                               ),
@@ -196,6 +246,11 @@ class _TransactionState extends State<Transaction> {
             )
           ],
         ),
+      ) : Center(
+          child: SpinKitDoubleBounce(
+            color: Colors.pinkAccent,
+            size: 90.0,
+          )
       ),
     );
   }

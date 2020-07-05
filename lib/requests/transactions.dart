@@ -53,11 +53,11 @@ class TransactionsData {
       }
 
       List transaction_temp = user['transactions'];
-      List<Transaction> transactions = List<Transaction>();
+      List<TransactionModel> transactions = List<TransactionModel>();
 
       transaction_temp.forEach((transaction) {
         transactions.add(
-          Transaction(
+            TransactionModel(
             id: transaction['id'],
             session_id: transaction['session_id'],
             user_id: transaction['from'],

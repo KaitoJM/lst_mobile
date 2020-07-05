@@ -9,9 +9,10 @@ class User {
   String photo;
   String type;
   List<Order> orders;
-  List<Transaction> transactions;
+  List<TransactionModel> transactions;
 
   double cashRecieveAmount; //for payment
+  bool loadingAddingCash = false;
 
   User({this.id, this.fname, this.lname, this.email, this.photo, this.type, this.orders, this.transactions});
 
