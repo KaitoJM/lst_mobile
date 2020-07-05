@@ -403,6 +403,7 @@ class SessionsData {
                   startDate: returnMap['session']['start_date'],
                   endDate: returnMap['session']['end_date'],
                   assigneeName: '${returnMap['user']['fname']} ${returnMap['user']['lname']}',
+                  assigneePhoto: '${returnMap['user']['photo']}',
                   products: sessionProducts
               )
           );

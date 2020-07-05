@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:lifesweettreatsordernotes/globals.dart';
 
 import 'package:lifesweettreatsordernotes/models/session.dart';
 import 'package:lifesweettreatsordernotes/requests/sessions.dart';
@@ -68,7 +69,7 @@ class _AssignmentsState extends State<Deliveries> {
               ),
               items: sessions.map((session) {
                 return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 25),
+                  padding: const EdgeInsets.symmetric(vertical: 50),
                   child: Container(
                     width: MediaQuery.of(context).size.width,
                     decoration: BoxDecoration(
@@ -78,125 +79,146 @@ class _AssignmentsState extends State<Deliveries> {
                         BoxShadow(color: Colors.black26, spreadRadius: 2, blurRadius: 15),
                       ],
                     ),
-                    child: Column(
+                    child: Stack(
+                      alignment: Alignment.topCenter,
+                      overflow: Overflow.visible,
                       children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.all(10),
-                          child: Text(session.assigneeName,
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                                fontWeight: FontWeight.bold,
-                                fontSize: 18
-                            ),
+                        Positioned(
+                          top: -50,
+                          child: Container(
+                              width: 80.0,
+                              height: 80.0,
+                              decoration: new BoxDecoration(
+                                border: Border.all(color: Colors.white, width: 3, style: BorderStyle.solid),
+                                  shape: BoxShape.circle,
+                                  image: new DecorationImage(
+                                      fit: BoxFit.cover,
+                                      image: new NetworkImage('${global.user_photo_url}${session.assigneePhoto}')
+                                  )
+                              )
                           ),
                         ),
-                        Expanded(
-                          child: ListView(
-                            children: session.products.map((product) {
-                              return Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                        Column(
+                          children: <Widget>[
+                            Padding(
+                              padding: const EdgeInsets.fromLTRB(10, 50, 10, 10),
+                              child: Text(session.assigneeName,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 18
+                                ),
+                              ),
+                            ),
+                            Expanded(
+                              child: ListView(
+                                children: session.products.map((product) {
+                                  return Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: <Widget>[
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                                        child: Row(
+                                          children: <Widget>[
+                                            Text('${product.productName}',
+                                              overflow: TextOverflow.ellipsis,
+                                              style: TextStyle(
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.bold
+                                              ),
+                                            ),
+                                            Expanded(
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.end,
+                                                children: <Widget>[
+                                                  Text('₱${product.totalPaid()}',
+                                                    style: TextStyle(
+                                                        fontSize: 15,
+                                                        fontWeight: FontWeight.bold,
+                                                        color: Colors.pinkAccent
+                                                    ),
+                                                  ),
+                                                  Text('/₱${product.total()}',
+                                                    style: TextStyle(
+                                                      fontSize: 12,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                      Padding(
+                                        padding: const EdgeInsets.symmetric(horizontal: 10),
+                                        child: Column(
+                                          children: product.orderItems.map((item) {
+                                            return Row(
+                                              children: <Widget>[
+                                                SizedBox(width: 12),
+                                                (item.order.status == 1) ?
+                                                Icon(Icons.check) :
+                                                Icon(Icons.hourglass_empty),
+                                                Text('${item.qty} ',
+                                                  style: TextStyle(
+                                                      fontWeight: FontWeight.bold,
+                                                      fontSize: 12
+                                                  ),
+                                                ),
+                                                Text('${item.order.customerFName} ', overflow: TextOverflow.ellipsis),
+                                                Text('${item.order.customerLName} ', overflow: TextOverflow.ellipsis),
+                                                Text('x ${item.price} '),
+                                                Expanded(
+                                                  child: Text('₱${item.totalComuted()} ',
+                                                    style: TextStyle(
+                                                        fontWeight: FontWeight.bold,
+                                                        fontSize: 12
+                                                    ),
+                                                    textAlign: TextAlign.end,
+                                                  ),
+                                                ),
+                                              ],
+                                            );
+                                          }).toList(),
+                                        ),
+                                      ),
+                                      SizedBox(height: 10),
+                                      Divider(height:10),
+                                    ],
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 10),
+                              child: Row(
                                 children: <Widget>[
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10),
+                                  Text('TOTAL :'),
+                                  Expanded(
                                     child: Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
                                       children: <Widget>[
-                                        Text('${product.productName}',
-                                          overflow: TextOverflow.ellipsis,
+                                        Text('₱${session.total_paid()}',
                                           style: TextStyle(
-                                              fontSize: 15,
+                                              fontSize: 23,
+                                              fontWeight: FontWeight.bold,
+                                              color: Colors.pinkAccent
+                                          ),
+                                        ),
+                                        Text('/₱${session.total()}',
+                                          style: TextStyle(
+                                              fontSize: 18,
                                               fontWeight: FontWeight.bold
                                           ),
                                         ),
-                                        Expanded(
-                                          child: Row(
-                                            mainAxisAlignment: MainAxisAlignment.end,
-                                            children: <Widget>[
-                                              Text('₱${product.totalPaid()}',
-                                                style: TextStyle(
-                                                    fontSize: 15,
-                                                    fontWeight: FontWeight.bold,
-                                                    color: Colors.pinkAccent
-                                                ),
-                                              ),
-                                              Text('/₱${product.total()}',
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        )
                                       ],
                                     ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.symmetric(horizontal: 10),
-                                    child: Column(
-                                      children: product.orderItems.map((item) {
-                                        return Row(
-                                          children: <Widget>[
-                                            SizedBox(width: 12),
-                                            (item.order.status == 1) ?
-                                              Icon(Icons.check) :
-                                              Icon(Icons.hourglass_empty),
-                                            Text('${item.qty} ',
-                                              style: TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 12
-                                              ),
-                                            ),
-                                            Text('${item.order.customerFName} ', overflow: TextOverflow.ellipsis),
-                                            Text('${item.order.customerLName} ', overflow: TextOverflow.ellipsis),
-                                            Text('x ${item.price} '),
-                                            Expanded(
-                                              child: Text('₱${item.totalComuted()} ',
-                                                style: TextStyle(
-                                                    fontWeight: FontWeight.bold,
-                                                    fontSize: 12
-                                                ),
-                                                textAlign: TextAlign.end,
-                                              ),
-                                            ),
-                                          ],
-                                        );
-                                      }).toList(),
-                                    ),
-                                  ),
-                                  SizedBox(height: 10),
-                                  Divider(height:10),
+                                  )
                                 ],
-                              );
-                            }).toList(),
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 10),
-                          child: Row(
-                            children: <Widget>[
-                              Text('TOTAL :'),
-                              Expanded(
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.end,
-                                  children: <Widget>[
-                                    Text('₱${session.total_paid()}',
-                                      style: TextStyle(
-                                          fontSize: 23,
-                                          fontWeight: FontWeight.bold,
-                                          color: Colors.pinkAccent
-                                      ),
-                                    ),
-                                    Text('/₱${session.total()}',
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.bold
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            ],
-                          ),
-                        ),
+                              ),
+                            ),
+                          ],
+                        )
                       ],
                     ),
                   ),

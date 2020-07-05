@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:lifesweettreatsordernotes/globals.dart';
 import 'package:lifesweettreatsordernotes/requests/users.dart';
 
 class SideMenu extends StatefulWidget {
@@ -10,11 +11,15 @@ class SideMenu extends StatefulWidget {
 class _SideMenuState extends State<SideMenu> {
 
   String user_name = '';
+  String user_photo = '';
 
   void getUser() async {
     String user_name_temp = await UsersData().userName();
+    String user_photo_temp = await UsersData().userPhoto();
+
     setState(() {
       user_name = user_name_temp;
+      user_photo = user_photo_temp;
     });
   }
 
@@ -46,7 +51,17 @@ class _SideMenuState extends State<SideMenu> {
                   ),
                   child: Row(
                     children: <Widget>[
-                      Icon(Icons.person_pin, color: Colors.white),
+                      Container(
+                        width: 20.0,
+                        height: 20.0,
+                        decoration: new BoxDecoration(
+                            shape: BoxShape.circle,
+                            image: new DecorationImage(
+                                fit: BoxFit.cover,
+                                image: new NetworkImage('${global.user_photo_url}${user_photo}')
+                            )
+                        )
+                      ),
                       SizedBox(width: 10),
                       Text(user_name,
                         textAlign: TextAlign.start,

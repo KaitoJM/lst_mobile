@@ -101,6 +101,7 @@ class _LoginState extends State<Login> {
                                 prefs.setInt('user_id', response['user']['id']);
                                 prefs.setString('user_type', response['user']['type']);
                                 prefs.setString('user_name', '${response['user']['fname']} ${response['user']['lname']}');
+                                prefs.setString('user_photo', response['user']['photo']);
                                 print('saved ${response['user_id']}');
 
                                 message = null;

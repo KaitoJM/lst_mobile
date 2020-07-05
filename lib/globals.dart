@@ -1,6 +1,8 @@
 class Globals {
-//  String api_url = 'http://kid-jm.com/api/';
-  String api_url = 'http://172.18.5.209:8080/api/';
+  static String domain = 'http://kid-jm.com/';
+//  static String domain = 'http://172.18.5.209:8080/';
+  String api_url = '${domain}api/';
+  String user_photo_url = '${domain}uploads/users/';
 }
 
 Globals global = new Globals();

@@ -71,6 +71,11 @@ class UsersData {
     return prefs.getString('user_name') ?? '';
   }
 
+  Future<String> userPhoto() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getString('user_photo') ?? '';
+  }
+
   Future logOut() async {
 //    SharedPreferences.setMockInitialValues({});
     final prefs = await SharedPreferences.getInstance();

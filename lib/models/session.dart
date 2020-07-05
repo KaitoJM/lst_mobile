@@ -13,8 +13,9 @@ class Session {
 
 
   String assigneeName;
+  String assigneePhoto;
 
-  Session({this.id, this.name, this.startDate, this.endDate, this.status, this.orders, this.products, this.assigneeName, this.expense});
+  Session({this.id, this.name, this.startDate, this.endDate, this.status, this.orders, this.products, this.assigneeName, this.assigneePhoto, this.expense});
 
   double total_paid() {
     double total = 0;
