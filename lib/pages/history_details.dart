@@ -178,7 +178,7 @@ class _HistoryDetailsState extends State<HistoryDetails> {
                           children: <Widget>[
                             OutlineButton.icon(
                               onPressed: () {
-                                Navigator.pushReplacementNamed(context, '/transaction', arguments: {
+                                Navigator.pushNamed(context, '/transaction', arguments: {
                                   'session_id': session_id
                                 });
                               },

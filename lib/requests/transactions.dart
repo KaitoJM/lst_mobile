@@ -1,3 +1,4 @@
+import 'package:lifesweettreatsordernotes/models/Transaction.dart';
 import 'package:lifesweettreatsordernotes/models/orderItem.dart';
 import 'package:lifesweettreatsordernotes/models/user.dart';
 import 'package:http/http.dart';
@@ -14,34 +15,54 @@ class TransactionsData {
     print('Loaded transactions');
 
     List user_temp = json.decode(response.body);
+    print(user_temp);
     List<User> users = List<User>();
 
     user_temp.forEach((user) {
       List orders_temp = user['orders'];
       List<Order> orders = List<Order>();
 
-      orders_temp.forEach((order) {
-        List items_temp = order['items'];
-        List<OrderItem> items = List<OrderItem>();
+      if (orders_temp.length > 0) {
+        orders_temp.forEach((order) {
+          List items_temp = order['items'];
+          List<OrderItem> items = List<OrderItem>();
 
-        items_temp.forEach((item) {
-          items.add(
-            OrderItem(
-              id: item['id'],
-              price: item['price'].toDouble(),
-              sessionProductId: item['session_product_id'],
-              productId: item['session_product']['product_id'],
-              productName: item['session_product']['product']['name'],
-              qty: item['qty'],
-            )
+          if (items_temp.length > 0) {
+            items_temp.forEach((item) {
+              items.add(
+                  OrderItem(
+                    id: item['id'],
+                    price: item['price'].toDouble(),
+                    sessionProductId: item['session_product_id'],
+                    productId: item['session_product']['product_id'],
+                    productName: item['session_product']['product']['name'],
+                    qty: item['qty'],
+                  )
+              );
+            });
+          }
+
+          orders.add(
+              Order(
+                  id: order['id'],
+                  status: order['status'],
+                  items: items
+              )
           );
         });
+      }
 
-        orders.add(
-          Order(
-            id: order['id'],
-            status: order['status'],
-            items: items
+      List transaction_temp = user['transactions'];
+      List<Transaction> transactions = List<Transaction>();
+
+      transaction_temp.forEach((transaction) {
+        transactions.add(
+          Transaction(
+            id: transaction['id'],
+            session_id: transaction['session_id'],
+            user_id: transaction['from'],
+            amount: transaction['amount'].toDouble(),
+            createdDate: transaction['created_at']
           )
         );
       });
@@ -51,11 +72,29 @@ class TransactionsData {
           id: user['id'],
           fname: user['fname'],
           lname: user['lname'],
-          orders: orders
+          orders: orders,
+          transactions: transactions
         )
       );
     });
 
     return users;
+  }
+
+  Future<Map> addTransaction(int sessionId, int userId, double amount) async {
+    Response response = await post('${global.api_url}add-transaction',
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(<String, dynamic>{
+        'session_id': sessionId,
+        'user_id': userId,
+        'amount': amount
+      })
+    );
+
+    Map result = json.decode(response.body);
+
+    return result;
   }
 }
