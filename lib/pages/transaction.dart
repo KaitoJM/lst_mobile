@@ -39,17 +39,23 @@ class _TransactionState extends State<Transaction> {
       user_type = type;
     });
   }
-
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    // TODO: implement initState
+    super.initState();
     Map data = ModalRoute.of(context).settings.arguments;
-    session_id = data['session_id'];
-    sessionName = data['session_name'];
-    sessionTotal = data['session_total'].toDouble();
-    sessionTotalPaid = data['session_total_paid'].toDouble();
+    setState(() {
+      session_id = data['session_id'];
+      sessionName = data['session_name'];
+      sessionTotal = data['session_total'].toDouble();
+      sessionTotalPaid = data['session_total_paid'].toDouble();
+    });
     getData();
 
     getUserType();
+  }
+  @override
+  Widget build(BuildContext context) {
 
     return Scaffold(
       appBar: AppBar(
