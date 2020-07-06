@@ -22,15 +22,14 @@ class _TransactionState extends State<Transaction> {
   List<User> users = List<User>();
 
   void getData() async {
-
-    if (loaded_transaction == false) {
-      List<User> users_temp = await TransactionsData().getTransactions(session_id);
+    setState(() {
       loaded_transaction = true;
-      setState(() {
-        users = users_temp;
-      });
-    }
-
+    });
+    List<User> users_temp = await TransactionsData().getTransactions(session_id);
+    print(loaded_transaction);
+    setState(() {
+      users = users_temp;
+    });
   }
 
   void getUserType() async {
@@ -39,10 +38,9 @@ class _TransactionState extends State<Transaction> {
       user_type = type;
     });
   }
+
   @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
+  Widget build(BuildContext context) {
     Map data = ModalRoute.of(context).settings.arguments;
     setState(() {
       session_id = data['session_id'];
@@ -50,12 +48,11 @@ class _TransactionState extends State<Transaction> {
       sessionTotal = data['session_total'].toDouble();
       sessionTotalPaid = data['session_total_paid'].toDouble();
     });
-    getData();
 
-    getUserType();
-  }
-  @override
-  Widget build(BuildContext context) {
+    if (loaded_transaction == false) {
+      getData();
+      getUserType();
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -67,7 +64,9 @@ class _TransactionState extends State<Transaction> {
           IconButton(
             icon: Icon(Icons.refresh),
             onPressed: () {
-              loaded_transaction = false;
+              setState(() {
+                loaded_transaction = false;
+              });
               getData();
             },
           )

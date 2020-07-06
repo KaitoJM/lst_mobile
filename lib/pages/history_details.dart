@@ -20,17 +20,15 @@ class _HistoryDetailsState extends State<HistoryDetails> {
   bool loaded_session = false;
 
   void setSession() async {
-    if (!loaded_session) {
-      setState(() {
-        loading = true;
-      });
-      Session temp = await SessionsData().getSessionByProduct(session_id, user_id);
-      setState(() {
-        loading = false;
-        session = temp;
-        loaded_session = true;
-      });
-    }
+    setState(() {
+      loading = true;
+      loaded_session = true;
+    });
+    Session temp = await SessionsData().getSessionByProduct(session_id, user_id);
+    setState(() {
+      loading = false;
+      session = temp;
+    });
   }
 
   void getUserType() async {
@@ -45,8 +43,11 @@ class _HistoryDetailsState extends State<HistoryDetails> {
     data = ModalRoute.of(context).settings.arguments;
 //    print(data);
     session_id = data['session_id'];
-    setSession();
-    getUserType();
+
+    if (!loaded_session) {
+      setSession();
+      getUserType();
+    }
 
     return Scaffold(
       appBar: AppBar(
