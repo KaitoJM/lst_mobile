@@ -98,7 +98,10 @@ class _SideMenuState extends State<SideMenu> {
                 ListTile(
                   leading: Icon(Icons.fastfood, color: Colors.pink),
                   title: Text('Products'),
-                  onTap: (){},
+                  onTap: (){
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, '/products');
+                  },
                 ),
                 ListTile(
                   leading: Icon(Icons.calendar_today, color: Colors.pink),
@@ -106,6 +109,14 @@ class _SideMenuState extends State<SideMenu> {
                   onTap: (){
                     Navigator.pop(context);
                     Navigator.pushNamed(context, '/sessions');
+                  },
+                ),
+                ListTile(
+                  leading: Icon(Icons.people, color: Colors.pink),
+                  title: Text('Customers'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, '/customers');
                   },
                 ),
                 ListTile(
