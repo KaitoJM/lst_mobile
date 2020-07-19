@@ -69,7 +69,14 @@ class _CustomersState extends State<Customers> {
                     Positioned(
                       bottom: 0,
                       right: 0,
-                      child: Icon(Icons.edit, size: 18),
+                      child: GestureDetector(
+                        child: Icon(Icons.edit, size: 18),
+                        onTap: () {
+                          Navigator.pushNamed(context, '/customer_form', arguments: {
+                            'id': customer.id
+                          });
+                        },
+                      ),
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.center,

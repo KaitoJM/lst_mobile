@@ -97,4 +97,14 @@ class TransactionsData {
 
     return result;
   }
+
+  Future<Map> getTotalMoney() async {
+    print('Loading money...');
+    Response response = await get('${global.api_url}get-money');
+    print('Loaded money');
+
+    Map result = json.decode(response.body);
+
+    return result;
+  }
 }

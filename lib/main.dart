@@ -12,6 +12,7 @@ import 'pages/assignments.dart';
 import 'pages/transaction.dart';
 import 'pages/customers.dart';
 import 'pages/products.dart';
+import 'pages/customer_edit.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -30,7 +31,8 @@ void main() {
       '/deliveries': (context) => Deliveries(),
       '/transaction': (context) => Transaction(),
       '/customers': (context) => Customers(),
-      '/products': (context) => Products()
+      '/products': (context) => Products(),
+      '/customer_form': (context) => CustomerForm(),
     },
   ));
 }
