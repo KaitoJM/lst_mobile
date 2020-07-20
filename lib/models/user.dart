@@ -12,6 +12,7 @@ class User {
   List<TransactionModel> transactions;
 
   double cashRecieveAmount; //for payment
+  bool pay_bank = false;
   bool loadingAddingCash = false;
 
   User({this.id, this.fname, this.lname, this.email, this.photo, this.type, this.orders, this.transactions});

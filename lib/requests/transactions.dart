@@ -62,7 +62,8 @@ class TransactionsData {
             session_id: transaction['session_id'],
             user_id: transaction['from'],
             amount: transaction['amount'].toDouble(),
-            createdDate: transaction['created_at']
+            createdDate: transaction['transaction_date'],
+            payType: (transaction['payment_type'] == 'bank') ? true : false
           )
         );
       });
@@ -81,7 +82,7 @@ class TransactionsData {
     return users;
   }
 
-  Future<Map> addTransaction(int sessionId, int userId, double amount) async {
+  Future<Map> addTransaction(int sessionId, int userId, double amount, bool type) async {
     Response response = await post('${global.api_url}add-transaction',
       headers: <String, String>{
         'Content-Type': 'application/json; charset=UTF-8',
@@ -89,8 +90,24 @@ class TransactionsData {
       body: jsonEncode(<String, dynamic>{
         'session_id': sessionId,
         'user_id': userId,
-        'amount': amount
+        'amount': amount,
+        'type': type
       })
+    );
+
+    Map result = json.decode(response.body);
+
+    return result;
+  }
+
+  Future<Map> removeTransaction(int transactionId) async {
+    Response response = await post('${global.api_url}remove-transaction',
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, dynamic>{
+          'transaction_id': transactionId,
+        })
     );
 
     Map result = json.decode(response.body);

@@ -333,6 +333,18 @@ class _OrderListState extends State<OrderList> {
                     'session_id': session.id
                   });
                 },
+              ),
+            if(session.status == 1)
+              IconButton(
+                icon: Icon(Icons.monetization_on),
+                onPressed: (){
+                  Navigator.pushNamed(context, '/transaction', arguments: {
+                    'session_id': session.id,
+                    'session_name': session.name,
+                    'session_total': session.total(),
+                    'session_total_paid': session.total_paid()
+                  });
+                },
               )
           ],
         ),

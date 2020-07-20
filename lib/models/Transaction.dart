@@ -4,6 +4,7 @@ class TransactionModel {
   int user_id;
   double amount;
   String createdDate;
+  bool payType;
 
-  TransactionModel({this.id, this.session_id, this.user_id, this.amount, this.createdDate});
+  TransactionModel({this.id, this.session_id, this.user_id, this.amount, this.payType, this.createdDate});
 }
