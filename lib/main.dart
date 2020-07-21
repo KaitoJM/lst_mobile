@@ -13,6 +13,7 @@ import 'pages/transaction.dart';
 import 'pages/customers.dart';
 import 'pages/products.dart';
 import 'pages/customer_edit.dart';
+import 'pages/money.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -33,6 +34,7 @@ void main() {
       '/customers': (context) => Customers(),
       '/products': (context) => Products(),
       '/customer_form': (context) => CustomerForm(),
+      '/money': (context) => Money()
     },
   ));
 }

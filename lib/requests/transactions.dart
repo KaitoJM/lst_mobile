@@ -124,4 +124,29 @@ class TransactionsData {
 
     return result;
   }
+
+  Future<List<TransactionModel>> getMoneyTransactions() async {
+    print('Loading transactions...');
+    Response response = await get('${global.api_url}get-money-transactions');
+    print('Loaded transactions');
+
+    List transaction_temp = json.decode(response.body);
+    List<TransactionModel> transactions = List<TransactionModel>();
+
+    transaction_temp.forEach((transaction) {
+      transactions.add(
+          TransactionModel(
+              id: transaction['id'],
+              session_id: transaction['session_id'],
+              user_id: transaction['from'],
+              amount: transaction['amount'].toDouble(),
+              createdDate: transaction['transaction_date'],
+              payType: (transaction['payment_type'] == 'bank') ? true : false,
+              direction: transaction['cash_direction']
+          )
+      );
+    });
+
+    return transactions;
+  }
 }

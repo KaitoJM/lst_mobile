@@ -207,6 +207,14 @@ class _SideMenuState extends State<SideMenu> {
                   },
                 ),
                 ListTile(
+                  leading: Icon(Icons.monetization_on, color: Colors.pink),
+                  title: Text('Money'),
+                  onTap: (){
+                    Navigator.pop(context);
+                    Navigator.pushNamed(context, '/money');
+                  },
+                ),
+                ListTile(
                   leading: Icon(Icons.lock_outline, color: Colors.pink),
                   title: Text('Logout'),
                   onTap: () async {
