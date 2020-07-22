@@ -149,4 +149,21 @@ class TransactionsData {
 
     return transactions;
   }
+
+  Future<Map> transaction(double amount, String direction, bool type) async {
+    print('Loading transaction...');
+    Response response = await post('${global.api_url}transaction',
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, dynamic>{
+          'amount': amount,
+          'payment_type' : (type) ? 'bank' : 'cash',
+          'cash_direction' : direction
+        })
+    );
+    print('Loaded transaction');
+
+    return json.decode(response.body);
+  }
 }

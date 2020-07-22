@@ -41,10 +41,15 @@ class _SideMenuState extends State<SideMenu> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  void initState() {
+    // TODO: implement initState
+    super.initState();
     getUser();
     getMoney();
+  }
 
+  @override
+  Widget build(BuildContext context) {
     return Drawer(
       child: Column(
         children: <Widget>[

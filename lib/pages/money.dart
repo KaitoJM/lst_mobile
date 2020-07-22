@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:lifesweettreatsordernotes/models/Transaction.dart';
 import 'package:lifesweettreatsordernotes/requests/transactions.dart';
+import 'package:lifesweettreatsordernotes/requests/users.dart';
 
 class Money extends StatefulWidget {
   @override
@@ -13,6 +14,8 @@ class _MoneyState extends State<Money> {
   bool loadedTransactions = false;
   List<TransactionModel> transactions = List<TransactionModel>();
   bool openform = false;
+  TransactionModel form = TransactionModel(payType: false, direction: 'cash-in');
+  String user_type;
 
   void loadTransaction() async {
     loadedTransactions = false;
@@ -24,11 +27,20 @@ class _MoneyState extends State<Money> {
     });
   }
 
+  void getUserType() async {
+    String type = await UsersData().userType();
+    print(type);
+    setState(() {
+      user_type = type;
+    });
+  }
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     loadTransaction();
+    getUserType();
   }
 
   @override
@@ -97,7 +109,9 @@ class _MoneyState extends State<Money> {
                         child: Text('Cash-out', textAlign: TextAlign.center ,style: TextStyle(color: Colors.white)),
                       ),
                     ),
+                    if (user_type == 'finance')
                     SizedBox(width: 10),
+                    if (user_type == 'finance')
                     GestureDetector(
                       onTap: () {
                         setState(() {
@@ -202,18 +216,28 @@ class _MoneyState extends State<Money> {
                         Row(
                           children: <Widget>[
                             GestureDetector(
-                              onTap: () {},
+                              onTap: () {
+                                if (form.direction == 'cash-out') {
+                                  setState(() {
+                                    form.direction = 'cash-in';
+                                  });
+                                } else {
+                                  setState(() {
+                                    form.direction = 'cash-out';
+                                  });
+                                }
+                              },
                               child: Container(
                                 decoration: BoxDecoration(
-                                  color: Colors.amber,
+                                  color: (form.direction == 'cash-out') ? Colors.red : Colors.green[500],
                                   borderRadius: BorderRadius.circular(5)
                                 ),
                                 padding: EdgeInsets.all(5),
-                                child: Icon(Icons.file_upload),
+                                child: Icon((form.direction == 'cash-out') ? Icons.file_upload : Icons.file_download),
                               ),
                             ),
                             SizedBox(width: 10),
-                            Text('CASH-OUT', style: TextStyle(
+                            Text((form.direction == 'cash-out') ? 'CASH-OUT' : 'CASH-IN', style: TextStyle(
                               fontSize: 18,
                               fontWeight: FontWeight.bold
                             ))
@@ -223,18 +247,28 @@ class _MoneyState extends State<Money> {
                         Row(
                           children: <Widget>[
                             GestureDetector(
-                              onTap: () {},
+                              onTap: () {
+                                if (!form.payType) {
+                                  setState(() {
+                                    form.payType = true;
+                                  });
+                                } else {
+                                  setState(() {
+                                    form.payType = false;
+                                  });
+                                }
+                              },
                               child: Container(
                                 decoration: BoxDecoration(
                                     color: Colors.amber,
                                     borderRadius: BorderRadius.circular(5)
                                 ),
                                 padding: EdgeInsets.all(5),
-                                child: Icon(Icons.account_balance_wallet),
+                                child: (!form.payType) ? Icon(Icons.account_balance_wallet) : Icon(Icons.account_balance),
                               ),
                             ),
                             SizedBox(width: 10),
-                            Text('CASH', style: TextStyle(
+                            Text((!form.payType) ? 'CASH' : 'BANK', style: TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold
                             ))
@@ -258,13 +292,25 @@ class _MoneyState extends State<Money> {
                             ),
                             //fillColor: Colors.green
                           ),
+                          onChanged: (val) {
+                            this.form.amount = double.parse(val);
+                          },
                         ),
                         SizedBox(height: 15),
                         SizedBox(
                           width: double.infinity,
                           child: RaisedButton(
                             color: Colors.pinkAccent,
-                            onPressed: (){},
+                            onPressed: () async {
+                              Map result = await TransactionsData().transaction(this.form.amount, this.form.direction, this.form.payType);
+
+                              if (result['err'] == 0) {
+                                loadTransaction();
+                                setState(() {
+                                  openform = false;
+                                });
+                              }
+                            },
                             child: Text('ADD', style: TextStyle(
                               color: Colors.white
                             ),),
