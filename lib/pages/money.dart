@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:lifesweettreatsordernotes/models/Transaction.dart';
 import 'package:lifesweettreatsordernotes/requests/transactions.dart';
 import 'package:lifesweettreatsordernotes/requests/users.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class Money extends StatefulWidget {
   @override
@@ -17,9 +18,12 @@ class _MoneyState extends State<Money> {
   TransactionModel form = TransactionModel(payType: false, direction: 'cash-in');
   String user_type;
 
-  void loadTransaction() async {
-    loadedTransactions = false;
-    transactions = await TransactionsData().getMoneyTransactions();
+  void loadTransaction({String transaction = ''}) async {
+    setState(() {
+      loadedTransactions = false;
+    });
+
+    transactions = await TransactionsData().getMoneyTransactions(transaction: transaction);
 
     setState(() {
       transactions = transactions;
@@ -74,7 +78,9 @@ class _MoneyState extends State<Money> {
                 Row(
                   children: <Widget>[
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        loadTransaction();
+                      },
                       child: Container(
                         width: 80,
                         padding: EdgeInsets.all(8),
@@ -86,7 +92,9 @@ class _MoneyState extends State<Money> {
                       ),
                     ),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        loadTransaction(transaction: 'cash-in');
+                      },
                       child: Container(
                         width: 80,
                         padding: EdgeInsets.all(8),
@@ -98,7 +106,9 @@ class _MoneyState extends State<Money> {
                       ),
                     ),
                     GestureDetector(
-                      onTap: () {},
+                      onTap: () {
+                        loadTransaction(transaction: 'cash-out');
+                      },
                       child: Container(
                         width: 80,
                         padding: EdgeInsets.all(8),
@@ -124,6 +134,7 @@ class _MoneyState extends State<Money> {
                   mainAxisAlignment: MainAxisAlignment.center,
                 ),
                 SizedBox(height: 15),
+                (loadedTransactions) ?
                 Expanded(
                   child: ListView(
                     children: transactions.map((transaction) {
@@ -182,6 +193,14 @@ class _MoneyState extends State<Money> {
                         ),
                       );
                     }).toList(),
+                  ),
+                ) :
+                Expanded(
+                  child: Center(
+                    child: SpinKitDoubleBounce(
+                      color: Colors.white,
+                      size: 90.0,
+                    ),
                   ),
                 )
               ],

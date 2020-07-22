@@ -125,9 +125,16 @@ class TransactionsData {
     return result;
   }
 
-  Future<List<TransactionModel>> getMoneyTransactions() async {
+  Future<List<TransactionModel>> getMoneyTransactions({String transaction = ''}) async {
     print('Loading transactions...');
-    Response response = await get('${global.api_url}get-money-transactions');
+    Response response = await post('${global.api_url}get-money-transactions',
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(<String, dynamic>{
+          'transaction_type': transaction,
+        })
+    );
     print('Loaded transactions');
 
     List transaction_temp = json.decode(response.body);
