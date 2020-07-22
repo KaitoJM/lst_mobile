@@ -6,6 +6,7 @@ import 'package:lifesweettreatsordernotes/models/Transaction.dart';
 import 'package:lifesweettreatsordernotes/models/user.dart';
 import 'package:lifesweettreatsordernotes/requests/transactions.dart';
 import 'package:lifesweettreatsordernotes/requests/users.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 
 class Transaction extends StatefulWidget {
   @override
@@ -23,11 +24,14 @@ class _TransactionState extends State<Transaction> {
 
   void getData() async {
     setState(() {
-      loaded_transaction = true;
+      loaded_transaction = false;
     });
+
     List<User> users_temp = await TransactionsData().getTransactions(session_id);
     print(loaded_transaction);
+
     setState(() {
+      loaded_transaction = true;
       users = users_temp;
     });
   }
@@ -146,10 +150,16 @@ class _TransactionState extends State<Transaction> {
                           ),
                           child: Row(
                             children: <Widget>[
-                              Text('${user.fname} ', style: TextStyle(color: Colors.white)),
-                              Text('${user.lname}', style: TextStyle(color: Colors.white)),
-                              Text(' - ₱${user.totalAmountToBePaid()}', style: TextStyle(color: Colors.white)),
-                              Expanded(child: Text('/₱${user.totalAmount()}', style: TextStyle(color: Colors.white))),
+                              Expanded(
+                                child: Column(
+                                  children: <Widget>[
+                                    Text('${user.fname} ${user.lname}', style: TextStyle(color: Colors.white)),
+                                    SizedBox(height: 5),
+                                    Text('₱${user.totalAmountToBePaid()}/₱${user.totalAmount()}', style: TextStyle(color: Colors.white70, fontSize: 12)),
+                                  ],
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                ),
+                              ),
                               Container(
                                 padding: EdgeInsets.all(5),
                                 decoration: BoxDecoration(
@@ -268,78 +278,83 @@ class _TransactionState extends State<Transaction> {
                                   ),
                                   color: Colors.black54,
                                 ),
-                                child: Row(
+                                child: Column(
                                   children: <Widget>[
-                                    Expanded(
-                                      child: Text('Cash-in : ',
-                                        style: TextStyle(
+                                    Text('Cash-in : ',
+                                      style: TextStyle(
                                           fontSize: 12,
                                           color: Colors.white
-                                        ),
                                       ),
                                     ),
-                                    SizedBox(
-                                      width: 50,
-                                      child: Container(
-                                        decoration: BoxDecoration(
-                                          border: Border.all(color: (user.pay_bank) ? Colors.amber : Colors.white, width: 1, style: BorderStyle.solid),
-                                          borderRadius: BorderRadius.circular(5),
-                                          color: (user.pay_bank) ? Colors.amber[400] : Colors.transparent
-                                        ),
-                                        child: GestureDetector(
-                                          child: Icon(
-                                            Icons.credit_card,
-                                            color: (user.pay_bank) ? Colors.white : Colors.white,
+                                    Row(
+                                      children: <Widget>[
+                                        SizedBox(
+                                          width: 50,
+                                          child: Container(
+                                            decoration: BoxDecoration(
+                                              border: Border.all(color: (user.pay_bank) ? Colors.amber : Colors.white, width: 1, style: BorderStyle.solid),
+                                              borderRadius: BorderRadius.circular(5),
+                                              color: (user.pay_bank) ? Colors.amber[400] : Colors.transparent
+                                            ),
+                                            child: GestureDetector(
+                                              child: Icon(
+                                                Icons.credit_card,
+                                                color: (user.pay_bank) ? Colors.white : Colors.white,
+                                              ),
+                                              onTap: () {
+                                                setState(() {
+                                                  user.pay_bank = !user.pay_bank;
+                                                });
+                                              },
+                                            ),
                                           ),
-                                          onTap: () {
-                                            setState(() {
-                                              user.pay_bank = !user.pay_bank;
-                                            });
+                                        ),
+                                        SizedBox(width: 10),
+                                        Expanded(
+                                          child: SizedBox(
+                                            width: 60,
+                                            height: 25,
+                                            child: TextField(
+                                              onChanged: (val) {
+                                                user.cashRecieveAmount = double.parse(val);
+                                              },
+                                              style: TextStyle(
+                                                  fontSize: 12.0,
+                                                  height: 1.5,
+                                                  color: Colors.white
+                                              ),
+                                              keyboardType: TextInputType.number,
+                                            ),
+                                          ),
+                                        ),
+                                        SizedBox(width: 10),
+                                        if (!user.loadingAddingCash)
+                                        OutlineButton.icon(
+                                          icon: Icon(Icons.add, color: Colors.white),
+                                          label: Text((user.pay_bank) ? 'Bank' : 'Cash', style: TextStyle(color: Colors.white)),
+                                          onPressed: () async {
+                                            print(user.cashRecieveAmount);
+                                            user.loadingAddingCash = true;
+                                            Map res = await TransactionsData().addTransaction(session_id, user.id, user.cashRecieveAmount, user.pay_bank);
+                                            user.loadingAddingCash = false;
+                                            if (res['err'] == 0) {
+                                              TransactionModel newTransaction = TransactionModel(id: res['id'], session_id: session_id, user_id: user.id, amount: user.cashRecieveAmount,payType: user.pay_bank,createdDate: res['date']);
+                                              setState(() {
+                                                user.transactions.add(newTransaction);
+                                              });
+                                            }
                                           },
-                                        ),
-                                      ),
+                                        ) else SizedBox(
+                                          width: 100,
+                                          child: SpinKitThreeBounce(
+                                            color: Colors.pinkAccent,
+                                            size: 15,
+                                          ),
+                                        )
+                                      ],
                                     ),
-                                    SizedBox(width: 10),
-                                    SizedBox(
-                                      width: 60,
-                                      height: 25,
-                                      child: TextField(
-                                        onChanged: (val) {
-                                          user.cashRecieveAmount = double.parse(val);
-                                        },
-                                        style: TextStyle(
-                                            fontSize: 12.0,
-                                            height: 1.5,
-                                            color: Colors.white
-                                        ),
-                                        keyboardType: TextInputType.number,
-                                      ),
-                                    ),
-                                    SizedBox(width: 10),
-                                    if (!user.loadingAddingCash)
-                                    OutlineButton.icon(
-                                      icon: Icon(Icons.add, color: Colors.white),
-                                      label: Text((user.pay_bank) ? 'Bank' : 'Cash', style: TextStyle(color: Colors.white)),
-                                      onPressed: () async {
-                                        print(user.cashRecieveAmount);
-                                        user.loadingAddingCash = true;
-                                        Map res = await TransactionsData().addTransaction(session_id, user.id, user.cashRecieveAmount, user.pay_bank);
-                                        user.loadingAddingCash = false;
-                                        if (res['err'] == 0) {
-                                          TransactionModel newTransaction = TransactionModel(id: res['id'], session_id: session_id, user_id: user.id, amount: user.cashRecieveAmount,payType: user.pay_bank,createdDate: res['date']);
-                                          setState(() {
-                                            user.transactions.add(newTransaction);
-                                          });
-                                        }
-                                      },
-                                    ) else SizedBox(
-                                      width: 100,
-                                      child: SpinKitThreeBounce(
-                                        color: Colors.pinkAccent,
-                                        size: 15,
-                                      ),
-                                    )
                                   ],
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                 ),
                               ),
                             )
